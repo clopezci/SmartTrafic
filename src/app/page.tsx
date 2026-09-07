@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { CinematicDemo } from "@/components/cinematic-demo";
 import { Bento, Button, Kicker, Pill } from "@/components/ui";
 
 export default function HomePage() {
@@ -16,7 +17,7 @@ export default function HomePage() {
         </Button>
       </header>
 
-      <section className="grid items-end gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+      <section className="grid items-end gap-10 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <Pill tone="green">Fase 1 · plataforma municipal</Pill>
           <h1 className="mt-5 font-display text-5xl leading-[0.95] text-white md:text-7xl">
@@ -33,28 +34,17 @@ export default function HomePage() {
             <Button href="/entrar">
               Ver el tablero <ArrowRight size={16} />
             </Button>
-            <Button href="/app/simulador" variant="ghost">
-              Probar el algoritmo
+            <Button href="/demo" variant="ghost">
+              Ver la simulación
             </Button>
           </div>
         </div>
-        <Bento glow="green" className="min-h-[320px]">
-          <Kicker>Cruce en vivo</Kicker>
-          <p className="mt-2 font-display text-2xl text-white">Parque × Calle Real</p>
-          <div className="mt-8 grid grid-cols-2 gap-4">
-            {[
-              ["Calle Real", "verde", 14, "pelotón a 200 m"],
-              ["Parque", "rojo", 22, "4 peatones"],
-              ["Batería solar", "87%", "", "3 días de autonomía"],
-              ["Motos en cola", "9", "", "peso propio, no autos"],
-            ].map(([a, b, , d]) => (
-              <div className="rounded-2xl bg-black/30 p-3" key={a}>
-                <p className="text-[11px] text-[var(--mute)]">{a}</p>
-                <p className="font-display text-2xl text-[var(--go)]">{b}</p>
-                <p className="text-[11px] text-white/50">{d}</p>
-              </div>
-            ))}
-          </div>
+        <Bento glow="green">
+          <Kicker>Cinco escenas en un cuadro</Kicker>
+          <p className="mt-1 mb-4 text-sm text-white/65">
+            Cola, ambulancia, motos, noche antiatraco y colegio. Rota solo.
+          </p>
+          <CinematicDemo compact />
         </Bento>
       </section>
 
