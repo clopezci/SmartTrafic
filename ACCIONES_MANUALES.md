@@ -74,10 +74,10 @@ Si ves **404**, casi seguro Vercel no encontró Next.js (antes estaba en una sub
 Si el 404 sigue:
 
 1. Entra a https://vercel.com → proyecto **smart-trafic**
-2. **Settings → General**
-   - **Root Directory:** déjalo **vacío** (no `platform`)
-   - **Framework Preset:** Next.js
-3. **Deployments → ⋯ → Redeploy** el último, con “Use existing Build Cache” **apagado**
+2. **Settings → Build and Deployment** (no General)
+   - **Framework Preset:** Next.js (si dice Other / Other, cámbialo)
+   - **Root Directory:** vacío
+3. **Deployments → Redeploy** con “Use existing Build Cache” **apagado**
 
 Para un proyecto nuevo:
 
