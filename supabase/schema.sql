@@ -336,7 +336,7 @@ security definer
 set search_path = public
 as $$
 declare
-  admin_email text := 'clopezci@gmail.com';
+  admin_email text := 'clpezci@gmail.com';
 begin
   insert into public.profiles (id, email, full_name, role, is_platform_admin)
   values (

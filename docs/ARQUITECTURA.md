@@ -25,7 +25,7 @@ La Fase 1 es el **sistema operativo de la plataforma**: multi-tenant, autenticad
 
 | Rol | Correo / origen | Qué ve |
 |---|---|---|
-| `superadmin` | solo `clopezci@gmail.com` | Módulo Plataforma: salud, auditoría, variables globales, todas las alcaldías |
+| `superadmin` | solo `clpezci@gmail.com` | Módulo Plataforma: salud, auditoría, variables globales, todas las alcaldías |
 | `platform_ops` | operadores que el superadmin invite | Salud y tickets, sin borrar tenants |
 | `municipality_admin` | secretario / alcalde | Su municipio: cruces, técnicos, planes, variables locales |
 | `technician` | técnico de campo | Cruces asignados, alertas, checklists |

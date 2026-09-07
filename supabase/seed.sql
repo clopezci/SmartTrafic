@@ -136,4 +136,4 @@ values
 
 insert into public.audit_events (actor_email, municipality_id, action, entity, entity_id, diff)
 values
-  ('clopezci@gmail.com', null, 'platform.bootstrap', 'system', 'fase-1', '{"note":"esquema inicial"}'::jsonb);
+  ('clpezci@gmail.com', null, 'platform.bootstrap', 'system', 'fase-1', '{"note":"esquema inicial"}'::jsonb);

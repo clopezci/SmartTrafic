@@ -32,7 +32,7 @@ async function LoginInner({
         ) : null}
         <form action="/api/auth/login" className="mt-6 space-y-4" method="post">
           <Field
-            defaultValue="clopezci@gmail.com"
+            defaultValue="clpezci@gmail.com"
             hint="El dueño de la plataforma es este correo."
             label="Correo"
             name="email"
@@ -49,7 +49,7 @@ async function LoginInner({
           </Button>
         </form>
         <div className="mt-6 space-y-1 text-[11px] text-[var(--mute)]">
-          <p>Superadmin · clopezci@gmail.com · Demo#SmartTrafic26</p>
+          <p>Superadmin · clpezci@gmail.com · Demo#SmartTrafic26</p>
           <p>Alcaldía · alcalde@villaesperanza.gov.co · Demo#Municipio26</p>
           <p>Técnico · tecnico@villaesperanza.gov.co · Demo#Tecnico26</p>
           <p>Policía · transito@villaesperanza.gov.co · Demo#Visor26</p>

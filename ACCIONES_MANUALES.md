@@ -2,7 +2,7 @@
 
 Solo aparecen aquí las cosas que **no puedo hacer yo desde este entorno**. Hazlas en paralelo mientras el código ya está en GitHub. Marca cada casilla cuando termines.
 
-Correo de superadmin de la plataforma: **clopezci@gmail.com**  
+Correo de superadmin de la plataforma: **clpezci@gmail.com**  
 Repo: https://github.com/clopezci/SmartTrafic
 
 ---
@@ -40,7 +40,7 @@ Repo: https://github.com/clopezci/SmartTrafic
 ### 0.4 Crear tu usuario admin (el único que ve el módulo de plataforma)
 
 1. En Supabase: **Authentication → Users → Add user → Create new user**
-2. Email: `clopezci@gmail.com`
+2. Email: `clpezci@gmail.com`
 3. Password: una que solo tú sepas (mínimo 12 caracteres, mayúscula, número, símbolo)
 4. Marca **Auto Confirm User**
 5. Luego **SQL Editor**, corre esto (cambia el uuid si el usuario ya existe; lo más simple es el seed que ya enlaza por email):
@@ -50,7 +50,7 @@ update public.profiles
 set role = 'superadmin',
     full_name = 'Cristian López',
     is_platform_admin = true
-where email = 'clopezci@gmail.com';
+where email = 'clpezci@gmail.com';
 ```
 
 Si el perfil no se creó solo (a veces el trigger tarda), corre `supabase/seed.sql` de nuevo o avísame.
@@ -78,7 +78,7 @@ Si el perfil no se creó solo (a veces el trigger tarda), corre `supabase/seed.s
 | `NEXT_PUBLIC_SUPABASE_URL` | la Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | la anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | la service_role |
-| `SUPERADMIN_EMAIL` | `clopezci@gmail.com` |
+| `SUPERADMIN_EMAIL` | `clpezci@gmail.com` |
 | `SESSION_SECRET` | una cadena larga aleatoria (32+ caracteres) |
 | `CRON_SECRET` | otra cadena aleatoria |
 | `TELEGRAM_BOT_TOKEN` | lo sacas en el paso 2 |
@@ -90,7 +90,7 @@ Si el perfil no se creó solo (a veces el trigger tarda), corre `supabase/seed.s
    - `https://TU-PROYECTO.vercel.app/auth/callback`
    - `http://localhost:3000/auth/callback`
 
-8. Prueba entrar con `clopezci@gmail.com`. Debes ver el módulo **Plataforma** (salud, auditoría, variables globales). Un usuario de alcaldía no debe verlo.
+8. Prueba entrar con `clpezci@gmail.com`. Debes ver el módulo **Plataforma** (salud, auditoría, variables globales). Un usuario de alcaldía no debe verlo.
 
 ---
 

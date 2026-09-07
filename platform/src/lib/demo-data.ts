@@ -20,11 +20,11 @@ export const DEMO_USERS: Record<
   string,
   { password: string; user: SessionUser }
 > = {
-  "clopezci@gmail.com": {
+  "clpezci@gmail.com": {
     password: "Demo#SmartTrafic26",
     user: {
       id: "u-admin",
-      email: "clopezci@gmail.com",
+      email: "clpezci@gmail.com",
       fullName: "Cristian López",
       role: "superadmin",
       municipalityId: null,
@@ -291,7 +291,7 @@ export const devices: Device[] = [
 ];
 
 export const auditEvents: AuditEvent[] = [
-  { id: "au-1", actorEmail: "clopezci@gmail.com", action: "platform.bootstrap", entity: "system", createdAt: new Date(Date.now() - 86400000).toISOString(), diff: "Fase 1 en línea" },
+  { id: "au-1", actorEmail: "clpezci@gmail.com", action: "platform.bootstrap", entity: "system", createdAt: new Date(Date.now() - 86400000).toISOString(), diff: "Fase 1 en línea" },
   { id: "au-2", actorEmail: "alcalde@villaesperanza.gov.co", action: "timing.update", entity: "CR-02", createdAt: new Date(Date.now() - 3600000).toISOString(), diff: "min_ped_s 12 → 16 (modo colegio)" },
   { id: "au-3", actorEmail: "tecnico@villaesperanza.gov.co", action: "alert.ack", entity: "TRUCK_PEAK", createdAt: new Date(Date.now() - 7200000).toISOString() },
 ];

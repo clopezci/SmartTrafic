@@ -24,7 +24,7 @@ Cuentas de demostración (también están en `/entrar`):
 
 | Rol | Correo | Clave |
 |---|---|---|
-| Dueño de plataforma | clopezci@gmail.com | Demo#SmartTrafic26 |
+| Dueño de plataforma | clpezci@gmail.com | Demo#SmartTrafic26 |
 | Alcaldía | alcalde@villaesperanza.gov.co | Demo#Municipio26 |
 | Técnico | tecnico@villaesperanza.gov.co | Demo#Tecnico26 |
 | Policía | transito@villaesperanza.gov.co | Demo#Visor26 |

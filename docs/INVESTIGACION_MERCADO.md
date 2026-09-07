@@ -88,7 +88,7 @@ Espacio de competencia: un modelo mixto (el municipio paga postes/ópticas/solar
 - **Fail-safe de conflicto:** nunca verde vs verde. Monitor de conflicto lógico + ámbar intermitente si hay duda. Equivalente funcional a MMU/CMU de gabinete NEMA.
 - **Tiempos mínimos y máximos** por fase, peatón y despeje (yellow + all-red). El algoritmo adaptativo no puede violarlos.
 - **Comunicación:** MQTT 5 sobre TLS 1.3, autenticación por dispositivo (certificado o HMAC), no HTTP polling.
-- **Identidad:** RBAC (superadmin, operador plataforma, alcaldía, técnico, policía/visor). Superadmin anclado al correo `clopezci@gmail.com`.
+- **Identidad:** RBAC (superadmin, operador plataforma, alcaldía, técnico, policía/visor). Superadmin anclado al correo `clpezci@gmail.com`.
 - **Auditoría:** cada cambio de plan, variable, usuario o comando de campo queda en log inmutable (append-only).
 - **Secretos:** nunca en el cliente. Service role solo en servidor. RLS en Postgres por `municipality_id`.
 - **Edge autónomo:** watchdog, last-known-good plan, degradación a tiempo fijo si fallan sensores.

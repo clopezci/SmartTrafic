@@ -1,5 +1,5 @@
 export const SUPERADMIN_EMAIL = (
-  process.env.SUPERADMIN_EMAIL || "clopezci@gmail.com"
+  process.env.SUPERADMIN_EMAIL || "clpezci@gmail.com"
 ).toLowerCase();
 
 export const PRODUCT = {
