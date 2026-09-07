@@ -4,16 +4,17 @@ Plataforma de semaforización solar, adaptativa y en suscripción para municipio
 
 ## Fase 1 (esto)
 
-- App Next.js en `platform/`
+- App Next.js en la raíz (`src/`)
 - Esquema Supabase en `supabase/`
 - Firmware de escritorio en `firmware/`
 - Investigación y arquitectura en `docs/`
 - Lo que solo tú puedes hacer: `ACCIONES_MANUALES.md`
 
+Producción: https://smart-trafic-six.vercel.app/
+
 ## Correr en local
 
 ```bash
-cd platform
 npm install
 npm run dev
 ```
@@ -33,4 +34,4 @@ El módulo **Plataforma** (salud, auditoría, variables globales) solo aparece c
 
 ## Vercel
 
-Root Directory = `platform`. Guía completa en `ACCIONES_MANUALES.md`.
+Importa el repo. **Root Directory vacío** (la app ya está en la raíz). Guía en `ACCIONES_MANUALES.md`.

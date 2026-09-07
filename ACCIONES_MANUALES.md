@@ -12,7 +12,7 @@ Repo: https://github.com/clopezci/SmartTrafic
 ### 0.1 Confirmar que GitHub te reconoce
 
 1. Abre https://github.com/clopezci/SmartTrafic
-2. Deberías ver el código de la Fase 1 (carpeta `platform/`, `docs/`, `supabase/`, `firmware/`).
+2. Deberías ver el código de la Fase 1 (`src/`, `docs/`, `supabase/`, `firmware/`).
 3. Si el repo sigue vacío, avísame: el push no llegó y lo reintento.
 
 ### 0.2 Crear el proyecto de Supabase
@@ -60,17 +60,31 @@ Si el perfil no se creó solo (a veces el trigger tarda), corre `supabase/seed.s
 1. **Authentication → Providers → Email**
 2. Confirm email: ON
 3. **Authentication → URL Configuration**
-   - Site URL (luego de Vercel): `https://TU-DOMINIO.vercel.app`
+   - Site URL (luego de Vercel): `https://smart-trafic-six.vercel.app`
 4. No habilites “Sign up” público. Los usuarios los crea el superadmin o el admin de alcaldía.
 
 ---
 
-## 1. Conectar Vercel (cuando te avise que la Fase 1 está lista)
+## 1. Conectar Vercel
+
+El proyecto ya está importado: https://smart-trafic-six.vercel.app/
+
+Si ves **404**, casi seguro Vercel no encontró Next.js (antes estaba en una subcarpeta). Ya lo movimos a la raíz. Tras el push, el deploy nuevo debe servir la app.
+
+Si el 404 sigue:
+
+1. Entra a https://vercel.com → proyecto **smart-trafic**
+2. **Settings → General**
+   - **Root Directory:** déjalo **vacío** (no `platform`)
+   - **Framework Preset:** Next.js
+3. **Deployments → ⋯ → Redeploy** el último, con “Use existing Build Cache” **apagado**
+
+Para un proyecto nuevo:
 
 1. Entra a https://vercel.com e inicia sesión con GitHub.
 2. **Add New → Project → Import** `clopezci/SmartTrafic`
-3. **Root Directory:** `platform`  (importante: el Next.js no está en la raíz)
-4. Framework: Next.js (lo detecta solo)
+3. **Root Directory:** vacío
+4. Framework: Next.js
 5. Environment Variables — pega estas:
 
 | Nombre | Valor |
@@ -83,11 +97,11 @@ Si el perfil no se creó solo (a veces el trigger tarda), corre `supabase/seed.s
 | `CRON_SECRET` | otra cadena aleatoria |
 | `TELEGRAM_BOT_TOKEN` | lo sacas en el paso 2 |
 | `TELEGRAM_ADMIN_CHAT_ID` | tu chat id |
-| `NEXT_PUBLIC_APP_URL` | la URL de Vercel cuando exista |
+| `NEXT_PUBLIC_APP_URL` | `https://smart-trafic-six.vercel.app` |
 
 6. Deploy.
 7. Cuando tenga URL, vuelve a Supabase → **Authentication → URL Configuration** y pon esa URL como Site URL. En Redirect URLs agrega:
-   - `https://TU-PROYECTO.vercel.app/auth/callback`
+   - `https://smart-trafic-six.vercel.app/auth/callback`
    - `http://localhost:3000/auth/callback`
 
 8. Prueba entrar con `clpezci@gmail.com`. Debes ver el módulo **Plataforma** (salud, auditoría, variables globales). Un usuario de alcaldía no debe verlo.

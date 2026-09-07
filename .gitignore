@@ -1,9 +1,12 @@
-cookies.txt
 node_modules
 .next
 .vercel
 .env
 .env.local
+.env*.local
 *.pem
 .DS_Store
 .turbo
+cookies.txt
+*.tsbuildinfo
+next-env.d.ts
