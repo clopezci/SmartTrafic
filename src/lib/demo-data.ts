@@ -27,7 +27,7 @@ export const DEMO_USERS: Record<
     user: {
       id: "u-admin",
       email: "clpezci@gmail.com",
-      fullName: "Cristian López",
+      fullName: "Carlos López",
       role: "superadmin",
       municipalityId: null,
       municipalityName: null,

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BrandMark } from "@/components/signal";
 import { Bento, Button, Field, Kicker } from "@/components/ui";
-import { getLandingCopy } from "@/lib/site-settings";
+import { getLandingCopy, hasCustomPassword } from "@/lib/site-settings";
 
 export default function LoginPage({
   searchParams,
@@ -18,6 +18,7 @@ async function LoginInner({
 }) {
   const q = await searchParams;
   const copy = await getLandingCopy();
+  const ownerCustom = await hasCustomPassword("clpezci@gmail.com");
   const errorText =
     q.error === "invalid"
       ? "Correo o clave incorrectos."
@@ -61,7 +62,10 @@ async function LoginInner({
         </form>
         {copy.showAccounts ? (
           <div className="mt-6 space-y-1 text-[11px] text-[var(--mute)]">
-            <p>Superadmin · clpezci@gmail.com · Demo#SmartTrafic26</p>
+            <p>
+              Superadmin · clpezci@gmail.com ·{" "}
+              {ownerCustom ? "la clave que definiste en Cuenta" : "Demo#SmartTrafic26"}
+            </p>
             <p>Alcaldía · alcalde@villaesperanza.gov.co · Demo#Municipio26</p>
             <p>Técnico · tecnico@villaesperanza.gov.co · Demo#Tecnico26</p>
             <p>Policía · transito@villaesperanza.gov.co · Demo#Visor26</p>

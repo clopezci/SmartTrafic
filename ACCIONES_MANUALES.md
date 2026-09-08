@@ -48,7 +48,7 @@ Repo: https://github.com/clopezci/SmartTrafic
 ```sql
 update public.profiles
 set role = 'superadmin',
-    full_name = 'Cristian López',
+    full_name = 'Carlos López',
     is_platform_admin = true
 where email = 'clpezci@gmail.com';
 ```

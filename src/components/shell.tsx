@@ -10,6 +10,7 @@ import {
   Map,
   Settings2,
   Shield,
+  User,
   Users,
   Wrench,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const NAV = [
   { href: "/app/activos", label: "Activos", icon: Cpu },
   { href: "/app/simulador", label: "Simulador", icon: Gauge },
   { href: "/app/reportes", label: "Reportes", icon: Activity },
+  { href: "/app/cuenta", label: "Cuenta", icon: User },
   { href: "/app/configuracion", label: "Variables", icon: Settings2 },
 ];
 
@@ -88,7 +90,10 @@ export function Shell({
                 ? ` · prueba hasta ${user.grantExpiresAt.slice(0, 10)}`
                 : ""}
             </p>
-            <button className="mt-3 flex items-center gap-2 text-xs text-white/60 hover:text-white" type="submit">
+            <Link className="mt-3 flex items-center gap-2 text-xs text-white/60 hover:text-white" href="/app/cuenta">
+              Cambiar nombre o clave
+            </Link>
+            <button className="mt-2 flex items-center gap-2 text-xs text-white/60 hover:text-white" type="submit">
               <LogOut size={14} />
               Salir
             </button>

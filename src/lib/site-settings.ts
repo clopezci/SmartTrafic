@@ -8,6 +8,8 @@ const COOKIE = "st_vars";
 const FLASH = "st_flash";
 const GRANTS_KEY = "access.grantsJson";
 const REVOKED_KEY = "access.revokedEmails";
+const NAMES_KEY = "account.namesJson";
+const PASSHASH_KEY = "account.passHashesJson";
 
 let memory: Record<string, string> | undefined;
 
@@ -104,7 +106,7 @@ function slim(values: Record<string, string>): Record<string, string> {
   const defaults = defaultPlatformValues();
   const out: Record<string, string> = {};
   for (const [key, value] of Object.entries(values)) {
-    if (key === GRANTS_KEY || key === REVOKED_KEY) {
+    if (key === GRANTS_KEY || key === REVOKED_KEY || key === NAMES_KEY || key === PASSHASH_KEY) {
       if (value) out[key] = value;
       continue;
     }
@@ -226,4 +228,50 @@ export async function consumeFlash(): Promise<string | null> {
   if (!raw) return null;
   jar.delete(FLASH);
   return decode(raw)?.t ?? null;
+}
+
+async function readJsonMap(key: string): Promise<Record<string, string>> {
+  const s = await readSavedValues();
+  try {
+    const parsed = JSON.parse(s[key] || "{}") as Record<string, string>;
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+export async function displayNames(): Promise<Record<string, string>> {
+  return readJsonMap(NAMES_KEY);
+}
+
+export async function passwordHashes(): Promise<Record<string, string>> {
+  return readJsonMap(PASSHASH_KEY);
+}
+
+export function hashPassword(password: string): string {
+  return createHmac("sha256", secret()).update(password).digest("base64url");
+}
+
+export function passwordMatchesHash(password: string, hash: string): boolean {
+  const got = Buffer.from(hashPassword(password));
+  const expected = Buffer.from(hash);
+  if (got.length !== expected.length) return false;
+  return timingSafeEqual(got, expected);
+}
+
+export async function setDisplayName(email: string, fullName: string): Promise<void> {
+  const names = await displayNames();
+  names[email.toLowerCase()] = fullName.trim();
+  await savePlatformValues({ [NAMES_KEY]: JSON.stringify(names) });
+}
+
+export async function setPasswordHash(email: string, password: string): Promise<void> {
+  const hashes = await passwordHashes();
+  hashes[email.toLowerCase()] = hashPassword(password);
+  await savePlatformValues({ [PASSHASH_KEY]: JSON.stringify(hashes) });
+}
+
+export async function hasCustomPassword(email: string): Promise<boolean> {
+  const hashes = await passwordHashes();
+  return Boolean(hashes[email.toLowerCase()]);
 }
