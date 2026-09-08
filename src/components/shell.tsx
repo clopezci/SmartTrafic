@@ -1,44 +1,10 @@
 import type { ReactNode } from "react";
-import {
-  Activity,
-  BarChart3,
-  Bell,
-  Building2,
-  Cpu,
-  Gauge,
-  LogOut,
-  Map,
-  Radio,
-  Settings2,
-  Shield,
-  User,
-  Users,
-  Wrench,
-} from "lucide-react";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
+import { DesktopNav, MobileDock } from "@/components/app-nav";
 import { isPlatformAdmin, roleLabel } from "@/lib/format";
 import { SignalMark } from "@/components/signal";
 import type { SessionUser } from "@/lib/types";
-
-const NAV = [
-  { href: "/app/tablero", label: "Tablero", icon: BarChart3 },
-  { href: "/app/en-vivo", label: "En vivo", icon: Radio },
-  { href: "/app/cruces", label: "Cruces", icon: Map },
-  { href: "/app/alertas", label: "Alertas", icon: Bell },
-  { href: "/app/tecnicos", label: "Técnicos", icon: Wrench },
-  { href: "/app/alcaldias", label: "Alcaldías", icon: Building2 },
-  { href: "/app/activos", label: "Activos", icon: Cpu },
-  { href: "/app/simulador", label: "Simulador", icon: Gauge },
-  { href: "/app/reportes", label: "Reportes", icon: Activity },
-  { href: "/app/cuenta", label: "Cuenta", icon: User },
-  { href: "/app/configuracion", label: "Variables", icon: Settings2 },
-];
-
-const PLATFORM = [
-  { href: "/app/plataforma/salud", label: "Salud del sistema", icon: Shield },
-  { href: "/app/plataforma/auditoria", label: "Auditoría", icon: Users },
-  { href: "/app/plataforma/variables", label: "Admin", icon: Settings2 },
-];
 
 export function Shell({
   user,
@@ -49,8 +15,8 @@ export function Shell({
 }) {
   const admin = isPlatformAdmin(user);
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
-      <aside className="border-b border-white/8 bg-[#080b11]/90 px-4 py-5 backdrop-blur lg:border-b-0 lg:border-r">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[240px_1fr]">
+      <aside className="hidden border-r border-white/8 bg-[#080b11]/90 px-4 py-5 backdrop-blur lg:flex lg:flex-col">
         <Link className="flex items-center gap-2 px-2" href="/app/tablero">
           <SignalMark size={26} />
           <span>
@@ -62,28 +28,8 @@ export function Shell({
             </span>
           </span>
         </Link>
-        <nav className="mt-8 flex gap-1 overflow-x-auto lg:flex-col">
-          {NAV.map((item) => (
-            <Link className="nav-link" href={item.href} key={item.href}>
-              <item.icon size={16} />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        {admin ? (
-          <div className="mt-8 hidden lg:block">
-            <p className="px-3 pb-2 text-[10px] uppercase tracking-[0.2em] text-[var(--go)]">
-              Plataforma
-            </p>
-            {PLATFORM.map((item) => (
-              <Link className="nav-link" href={item.href} key={item.href}>
-                <item.icon size={16} />
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        ) : null}
-        <form action="/api/auth/logout" className="mt-8 px-2" method="post">
+        <DesktopNav admin={admin} />
+        <form action="/api/auth/logout" className="mt-auto px-2 pt-8" method="post">
           <div className="rounded-2xl border border-white/8 bg-white/3 p-3">
             <p className="text-sm font-medium text-white">{user.fullName}</p>
             <p className="text-[11px] text-[var(--mute)]">
@@ -102,21 +48,26 @@ export function Shell({
           </div>
         </form>
       </aside>
-      <div className="min-h-screen">
-        <header className="flex items-center justify-between border-b border-white/8 px-5 py-4 md:px-8">
-          <div>
-            <p className="kicker">Centro de mando</p>
-            <p className="text-sm text-white/80">
-              {user.municipalityName ?? "Todas las alcaldías"} · {user.email}
+      <div className="flex min-h-dvh flex-col pb-[calc(4.75rem+env(safe-area-inset-bottom))] lg:pb-0">
+        <header className="app-topbar">
+          <Link className="lg:hidden" href="/app/tablero">
+            <SignalMark size={22} />
+          </Link>
+          <div className="min-w-0 flex-1">
+            <p className="kicker hidden sm:block">Centro de mando</p>
+            <p className="truncate text-sm text-white/80">
+              {user.municipalityName ?? "Todas las alcaldías"}
+              <span className="hidden text-white/45 sm:inline"> · {user.email}</span>
             </p>
           </div>
           <span className="live-dot">
             <span className="pulse" />
-            Red municipal
+            Red
           </span>
         </header>
-        <main className="px-5 py-6 md:px-8 md:py-8">{children}</main>
+        <main className="flex-1 px-3 py-4 md:px-8 md:py-8">{children}</main>
       </div>
+      <MobileDock admin={admin} user={user} />
     </div>
   );
 }

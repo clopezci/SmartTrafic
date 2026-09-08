@@ -90,10 +90,12 @@ Reglas que no se negocian:
 - `/plataforma/auditoria`
 - `/plataforma/variables` config global (Telegram, MQTT, flags)
 
+PWA instalable (`manifest`, service worker, iconos, dock inferior). Mobile-first: el tablero se usa con el pulgar.
+
 ## Qué viene después (no bloquea Vercel)
 
 - Firmware en ESP32-S3 / CM4 hablando MQTT real
 - Visión YOLO en edge
 - Resend + PDF al alcalde
-- App de técnico offline (PWA)
+- Modo técnico offline con cola de sync
 - Módulo de placas / fotomulta (solo con base legal)

@@ -87,12 +87,14 @@ export function Button({
   variant = "primary",
   type = "button",
   className,
+  onClick,
 }: {
   children: ReactNode;
   href?: string;
   variant?: "primary" | "ghost" | "danger";
   type?: "button" | "submit";
   className?: string;
+  onClick?: () => void;
 }) {
   const styles = {
     primary:
@@ -101,7 +103,7 @@ export function Button({
     danger: "bg-[var(--stop)] text-white hover:brightness-110",
   };
   const cls = cn(
-    "inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition",
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition",
     styles[variant],
     className,
   );
@@ -120,7 +122,7 @@ export function Button({
     );
   }
   return (
-    <button className={cls} type={type}>
+    <button className={cls} onClick={onClick} type={type}>
       {children}
     </button>
   );
@@ -148,7 +150,7 @@ export function Field({
   required?: boolean;
 }) {
   const box =
-    "w-full rounded-xl border border-white/10 bg-white/4 px-3 py-2.5 text-sm text-white outline-none ring-[var(--go)] focus:ring-2";
+    "w-full min-h-11 rounded-xl border border-white/10 bg-white/4 px-3 py-2.5 text-sm text-white outline-none ring-[var(--go)] focus:ring-2";
   return (
     <label className="block">
       <span className="mb-1.5 block text-xs text-[var(--mute)]">{label}</span>

@@ -11,8 +11,8 @@ export default async function HomePage() {
   const plans = await getLandingPlans();
   const copy = await getLandingCopy();
   return (
-    <div className="mx-auto max-w-6xl px-5 py-8 md:py-12">
-      <header className="mb-16 flex items-center justify-between">
+    <div className="mx-auto max-w-6xl px-4 py-6 md:px-5 md:py-12">
+      <header className="mb-10 flex items-center justify-between gap-3 md:mb-16">
         <BrandMark />
         <Button href="/entrar" variant="ghost">
           Entrar al tablero
@@ -22,7 +22,7 @@ export default async function HomePage() {
       <section className="grid items-end gap-10 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <Pill tone="green">{copy.pill}</Pill>
-          <h1 className="mt-5 font-display text-5xl leading-[0.95] text-white md:text-7xl">
+          <h1 className="mt-5 font-display text-4xl leading-[0.95] text-white sm:text-5xl md:text-7xl">
             {copy.hero1}
             <span className="block text-[var(--go)]">{copy.hero2}</span>
             {copy.hero3}

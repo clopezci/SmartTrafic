@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Syne } from "next/font/google";
+import { PwaProvider } from "@/components/pwa-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,10 +19,27 @@ const syne = Syne({
   weight: ["600", "700", "800"],
 });
 
+export const viewport: Viewport = {
+  themeColor: "#07060a",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "SmartTrafic — Movilidad inteligente para municipios",
   description:
     "Semaforización solar, adaptativa y en suscripción. El municipio pone los postes. Nosotros ponemos el cerebro.",
+  applicationName: "SmartTrafic",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SmartTrafic",
+  },
+  formatDetection: { telephone: false },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +53,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} antialiased`}
       >
         {children}
+        <PwaProvider />
       </body>
     </html>
   );

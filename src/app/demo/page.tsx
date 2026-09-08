@@ -5,8 +5,8 @@ import { Button, Kicker } from "@/components/ui";
 
 export default function DemoPage() {
   return (
-    <div className="mx-auto max-w-5xl px-5 py-8 md:py-12">
-      <header className="mb-8 flex items-center justify-between">
+    <div className="mx-auto max-w-5xl px-4 py-6 md:px-5 md:py-12">
+      <header className="mb-8 flex items-center justify-between gap-3">
         <Link className="flex items-center gap-2" href="/">
           <BrandMark />
         </Link>

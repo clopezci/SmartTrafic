@@ -26,7 +26,7 @@ async function LoginInner({
         ? "Los ingresos están cerrados. Escribe al dueño."
         : q.error;
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5">
+    <div className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-5 py-8 pb-[calc(2rem+env(safe-area-inset-bottom))]">
       <Link className="mb-6 flex justify-center" href="/">
         <BrandMark />
       </Link>

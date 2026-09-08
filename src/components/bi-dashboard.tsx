@@ -143,8 +143,8 @@ export function BiDashboard() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="bi-slicer">
+      <div className="-mx-3 flex items-center gap-2 overflow-x-auto px-3 pb-1 [scrollbar-width:none] md:mx-0 md:flex-wrap md:overflow-visible md:px-0">
+        <div className="bi-slicer shrink-0">
           {PERIODS.map((p) => (
             <button
               className={period === p.id ? "is-on" : undefined}
@@ -182,7 +182,9 @@ export function BiDashboard() {
                 <p className="mt-1 font-display text-2xl leading-none text-white">{item.value}</p>
                 <p className="mt-1 text-[10px] text-[var(--mute)]">{item.delta}</p>
               </div>
-              <Sparkline color={item.color} data={item.spark} />
+              <div className="hidden min-[400px]:block">
+                <Sparkline color={item.color} data={item.spark} />
+              </div>
             </div>
           </article>
         ))}
