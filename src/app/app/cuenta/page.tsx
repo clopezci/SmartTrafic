@@ -20,7 +20,8 @@ export default async function CuentaPage({
       <h1 className="font-display text-4xl text-white">Cuenta</h1>
       <p className="mt-2 max-w-xl text-sm text-[var(--mute)]">
         Nombre que sale en el tablero y clave de acceso. El correo del dueño no se
-        cambia.
+        cambia. Esta clave es de la sesión del tablero: el schema y la semilla no
+        crean usuarios en Authentication.
       </p>
       {flash ? (
         <p

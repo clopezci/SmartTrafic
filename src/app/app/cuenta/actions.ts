@@ -43,11 +43,19 @@ export async function updatePassword(formData: FormData) {
     await setFlash("La confirmación no coincide.");
     redirect("/app/cuenta?ok=err");
   }
-  await setPasswordHash(user.email, next);
-  const sb = await updateSupabaseAccount(user.email, { password: next });
+  try {
+    await setPasswordHash(user.email, next);
+  } catch {
+    await setFlash("No se pudo guardar la clave en este navegador. Recarga e inténtalo otra vez.");
+    redirect("/app/cuenta?ok=err");
+  }
+  const sb = await updateSupabaseAccount(user.email, {
+    password: next,
+    fullName: user.fullName,
+  });
   await setFlash(
     sb && sb !== "no-user"
-      ? "Clave cambiada en el tablero. En Supabase no se pudo actualizar: créala o cámbiala a mano en Authentication."
+      ? "Clave del tablero cambiada. Auth de Supabase aún no tiene este usuario (el seed no lo crea); entra con la nueva clave igual."
       : "Clave cambiada. Entra con esa a partir de ahora.",
   );
   redirect("/app/cuenta?ok=1");
