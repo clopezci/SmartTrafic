@@ -59,7 +59,7 @@ export default async function PlatformVarsPage({
             <Field hint="Cómo sale su nombre en el tablero." label="Nombre" name="fullName" />
             <Field
               defaultValue="admin"
-              hint="Admin ve este panel. Alcaldía / técnico / visor ven Villa Esperanza."
+              hint="Admin ve este panel. Alcaldía / técnico / visor ven El Carmen de Viboral."
               label="Rol"
               name="kind"
               options={[

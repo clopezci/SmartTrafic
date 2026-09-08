@@ -6,16 +6,16 @@ insert into public.municipalities (
   contract_start, contract_end, lat, lng, settings
 ) values (
   '11111111-1111-1111-1111-111111111111',
-  'Villa Esperanza',
-  'Cundinamarca',
+  'El Carmen de Viboral',
+  'Antioquia',
   'CO',
-  42000,
+  62000,
   'premium',
   1500000,
   current_date - 40,
   current_date + 320,
-  4.7110,
-  -74.0721,
+  6.0828,
+  -75.3352,
   '{
     "nightAntiCrime": true,
     "motoFirst": true,
@@ -25,7 +25,13 @@ insert into public.municipalities (
     "emergencyPreempt": true
   }'::jsonb
 )
-on conflict (id) do update set name = excluded.name, settings = excluded.settings;
+on conflict (id) do update set
+  name = excluded.name,
+  department = excluded.department,
+  population = excluded.population,
+  lat = excluded.lat,
+  lng = excluded.lng,
+  settings = excluded.settings;
 
 insert into public.municipalities (
   id, name, department, country, population, plan, monthly_fee_cop,
@@ -45,6 +51,27 @@ insert into public.municipalities (
 )
 on conflict (id) do update set name = excluded.name;
 
+-- If a previous seed used Villa Esperanza, rename leftover demo emails.
+update public.field_technicians
+  set email = replace(email, '@villaesperanza.gov.co', '@carmendeviboral.gov.co')
+  where email like '%@villaesperanza.gov.co';
+update public.credential_overrides
+  set email = replace(email, '@villaesperanza.gov.co', '@carmendeviboral.gov.co')
+  where email like '%@villaesperanza.gov.co';
+update public.display_names
+  set email = replace(email, '@villaesperanza.gov.co', '@carmendeviboral.gov.co')
+  where email like '%@villaesperanza.gov.co';
+update public.access_grants
+  set email = replace(email, '@villaesperanza.gov.co', '@carmendeviboral.gov.co')
+  where email like '%@villaesperanza.gov.co';
+update public.timing_profiles
+  set name = 'Perfil adaptativo El Carmen de Viboral'
+  where municipality_id = '11111111-1111-1111-1111-111111111111';
+update public.alerts
+  set title = replace(title, 'Hospital', 'Cementerio')
+  where municipality_id = '11111111-1111-1111-1111-111111111111'
+    and title like '%Hospital%';
+
 insert into public.intersections (
   id, municipality_id, code, name, geometry, lat, lng, approaches, plan, mode,
   online, health_score, solar, battery_pct, firmware_version, last_heartbeat_at
@@ -53,35 +80,57 @@ insert into public.intersections (
   '22222222-2222-2222-2222-222222222221',
   '11111111-1111-1111-1111-111111111111',
   'CR-01',
-  'Parque Principal × Calle Real',
-  'plus', 4.7122, -74.0710, 4, 'premium', 'normal',
+  'Parque Central',
+  'plus', 6.0828, -75.3352, 4, 'premium', 'normal',
   true, 98, true, 87.5, 'edge-0.9.1', now() - interval '8 seconds'
 ),
 (
   '22222222-2222-2222-2222-222222222222',
   '11111111-1111-1111-1111-111111111111',
   'CR-02',
-  'Colegio San José × Carrera 5',
-  't', 4.7098, -74.0742, 3, 'adaptativo', 'school',
+  'Ospina',
+  't', 6.0795, -75.3388, 3, 'adaptativo', 'school',
   true, 94, true, 72.0, 'edge-0.9.1', now() - interval '12 seconds'
 ),
 (
   '22222222-2222-2222-2222-222222222223',
   '11111111-1111-1111-1111-111111111111',
   'CR-03',
-  'Entrada Sur — Variante',
-  'plus', 4.7011, -74.0688, 4, 'adaptativo', 'normal',
-  true, 81, true, 41.0, 'edge-0.9.0', now() - interval '40 seconds'
+  'Estadio',
+  'plus', 6.0862, -75.3315, 4, 'adaptativo', 'normal',
+  true, 88, true, 64.0, 'edge-0.9.1', now() - interval '22 seconds'
 ),
 (
   '22222222-2222-2222-2222-222222222224',
   '11111111-1111-1111-1111-111111111111',
   'CR-04',
-  'Hospital × Paso peatonal',
-  'pedestrian', 4.7135, -74.0699, 2, 'premium', 'night',
+  'Cementerio',
+  'pedestrian', 6.0768, -75.3405, 2, 'premium', 'eco',
   false, 54, true, 18.0, 'edge-0.8.4', now() - interval '16 minutes'
+),
+(
+  '22222222-2222-2222-2222-222222222225',
+  '11111111-1111-1111-1111-111111111111',
+  'CR-05',
+  'Circunvalar',
+  'plus', 6.0895, -75.3278, 4, 'adaptativo', 'normal',
+  true, 81, true, 41.0, 'edge-0.9.0', now() - interval '40 seconds'
+),
+(
+  '22222222-2222-2222-2222-222222222226',
+  '11111111-1111-1111-1111-111111111111',
+  'CR-06',
+  'San Fernando',
+  'plus', 6.0848, -75.3422, 4, 'adaptativo', 'night',
+  true, 91, true, 76.0, 'edge-0.9.1', now() - interval '15 seconds'
 )
 on conflict (id) do update set
+  name = excluded.name,
+  geometry = excluded.geometry,
+  lat = excluded.lat,
+  lng = excluded.lng,
+  approaches = excluded.approaches,
+  plan = excluded.plan,
   health_score = excluded.health_score,
   battery_pct = excluded.battery_pct,
   mode = excluded.mode,
@@ -89,20 +138,28 @@ on conflict (id) do update set
 
 insert into public.approaches (id, intersection_id, name, heading_deg)
 values
-  ('33333333-3333-3333-3333-333333333301', '22222222-2222-2222-2222-222222222221', 'Calle Real Norte', 0),
+  ('33333333-3333-3333-3333-333333333301', '22222222-2222-2222-2222-222222222221', 'Carrera 30 Norte', 0),
   ('33333333-3333-3333-3333-333333333302', '22222222-2222-2222-2222-222222222221', 'Parque Este', 90),
-  ('33333333-3333-3333-3333-333333333303', '22222222-2222-2222-2222-222222222221', 'Calle Real Sur', 180),
+  ('33333333-3333-3333-3333-333333333303', '22222222-2222-2222-2222-222222222221', 'Carrera 30 Sur', 180),
   ('33333333-3333-3333-3333-333333333304', '22222222-2222-2222-2222-222222222221', 'Parque Oeste', 270),
-  ('33333333-3333-3333-3333-333333333305', '22222222-2222-2222-2222-222222222222', 'Carrera 5 Norte', 0),
-  ('33333333-3333-3333-3333-333333333306', '22222222-2222-2222-2222-222222222222', 'Frente colegio', 90),
-  ('33333333-3333-3333-3333-333333333307', '22222222-2222-2222-2222-222222222222', 'Carrera 5 Sur', 180),
-  ('33333333-3333-3333-3333-333333333308', '22222222-2222-2222-2222-222222222223', 'Variante entrada', 0),
-  ('33333333-3333-3333-3333-333333333309', '22222222-2222-2222-2222-222222222223', 'Calle 12 Este', 90),
-  ('33333333-3333-3333-3333-333333333310', '22222222-2222-2222-2222-222222222223', 'Variante salida', 180),
-  ('33333333-3333-3333-3333-333333333311', '22222222-2222-2222-2222-222222222223', 'Calle 12 Oeste', 270),
-  ('33333333-3333-3333-3333-333333333312', '22222222-2222-2222-2222-222222222224', 'Avenida Hospital', 90),
-  ('33333333-3333-3333-3333-333333333313', '22222222-2222-2222-2222-222222222224', 'Sentido contrario', 270)
-on conflict (id) do nothing;
+  ('33333333-3333-3333-3333-333333333305', '22222222-2222-2222-2222-222222222222', 'Calle 32 Norte', 0),
+  ('33333333-3333-3333-3333-333333333306', '22222222-2222-2222-2222-222222222222', 'Frente colegio Ospina', 90),
+  ('33333333-3333-3333-3333-333333333307', '22222222-2222-2222-2222-222222222222', 'Calle 32 Sur', 180),
+  ('33333333-3333-3333-3333-333333333308', '22222222-2222-2222-2222-222222222223', 'Avenida Estadio Norte', 0),
+  ('33333333-3333-3333-3333-333333333309', '22222222-2222-2222-2222-222222222223', 'Acceso tribuna', 90),
+  ('33333333-3333-3333-3333-333333333310', '22222222-2222-2222-2222-222222222223', 'Avenida Estadio Sur', 180),
+  ('33333333-3333-3333-3333-333333333311', '22222222-2222-2222-2222-222222222223', 'Calle lateral', 270),
+  ('33333333-3333-3333-3333-333333333312', '22222222-2222-2222-2222-222222222224', 'Calle Cementerio', 90),
+  ('33333333-3333-3333-3333-333333333313', '22222222-2222-2222-2222-222222222224', 'Sentido contrario', 270),
+  ('33333333-3333-3333-3333-333333333314', '22222222-2222-2222-2222-222222222225', 'Circunvalar entrada', 0),
+  ('33333333-3333-3333-3333-333333333315', '22222222-2222-2222-2222-222222222225', 'Calle 20 Este', 90),
+  ('33333333-3333-3333-3333-333333333316', '22222222-2222-2222-2222-222222222225', 'Circunvalar salida', 180),
+  ('33333333-3333-3333-3333-333333333317', '22222222-2222-2222-2222-222222222225', 'Calle 20 Oeste', 270),
+  ('33333333-3333-3333-3333-333333333318', '22222222-2222-2222-2222-222222222226', 'San Fernando Norte', 0),
+  ('33333333-3333-3333-3333-333333333319', '22222222-2222-2222-2222-222222222226', 'Calle 28 Este', 90),
+  ('33333333-3333-3333-3333-333333333320', '22222222-2222-2222-2222-222222222226', 'San Fernando Sur', 180),
+  ('33333333-3333-3333-3333-333333333321', '22222222-2222-2222-2222-222222222226', 'Calle 28 Oeste', 270)
+on conflict (id) do update set name = excluded.name;
 
 insert into public.devices (id, municipality_id, intersection_id, kind, serial, owner, label)
 values
@@ -115,7 +172,7 @@ values
 on conflict (id) do nothing;
 
 insert into public.timing_profiles (municipality_id, intersection_id, name)
-values ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222221', 'Perfil adaptativo Villa Esperanza')
+values ('11111111-1111-1111-1111-111111111111', '22222222-2222-2222-2222-222222222221', 'Perfil adaptativo El Carmen de Viboral')
 on conflict do nothing;
 
 insert into public.system_settings (key, value, municipality_id)
@@ -136,7 +193,7 @@ values
   '22222222-2222-2222-2222-222222222224',
   'critical',
   'BATTERY_LOW',
-  'Hospital en modo Eco — batería 18%',
+  'Cementerio en modo Eco — batería 18%',
   'Tres días nublados. El cruce degradó peatonal auxiliar y priorizó vehiculares. Revisar banco de baterías.'
 ),
 (
@@ -171,22 +228,22 @@ values
     '55555555-5555-5555-5555-555555555501',
     '11111111-1111-1111-1111-111111111111',
     'Laura Méndez',
-    'tecnico@villaesperanza.gov.co',
+    'tecnico@carmendeviboral.gov.co',
     '+57 310 555 0198',
     'disponible',
-    '{CR-01,CR-02}'
+    '{CR-01,CR-02,CR-03}'
   ),
   (
     '55555555-5555-5555-5555-555555555502',
     '11111111-1111-1111-1111-111111111111',
     'Andrés Pineda',
-    'andres.pineda@villaesperanza.gov.co',
+    'andres.pineda@carmendeviboral.gov.co',
     '+57 312 444 7710',
     'en_ruta',
-    '{CR-03,CR-04}'
+    '{CR-04,CR-05,CR-06}'
   )
 on conflict (municipality_id, email) do update
-  set status = excluded.status, assigned_codes = excluded.assigned_codes;
+  set status = excluded.status, assigned_codes = excluded.assigned_codes, full_name = excluded.full_name;
 
 insert into public.kpi_daily (
   day, municipality_id, wait_drop_pct, fuel_saved_gal, co2_tons, motos, trucks_3axle, uptime_pct

@@ -39,7 +39,7 @@ const PERIODS: { id: BiPeriod; label: string }[] = [
 ];
 
 const SCOPES: { id: BiScope; label: string }[] = [
-  { id: "villa", label: "Villa Esperanza" },
+  { id: "villa", label: "El Carmen de Viboral" },
   { id: "cedro", label: "El Cedro" },
   { id: "red", label: "Toda la red" },
 ];
@@ -91,6 +91,8 @@ export function BiDashboard() {
     "CR-02": "ix-2",
     "CR-03": "ix-3",
     "CR-04": "ix-4",
+    "CR-05": "ix-5",
+    "CR-06": "ix-6",
   };
 
   const flowSeries = useMemo(
@@ -108,6 +110,8 @@ export function BiDashboard() {
       { key: "cr02", color: "#7cb8ff", values: batteryWeek.map((d) => d.cr02) },
       { key: "cr03", color: "#ffbf24", values: batteryWeek.map((d) => d.cr03) },
       { key: "cr04", color: "#ff3b3b", values: batteryWeek.map((d) => d.cr04) },
+      { key: "cr05", color: "#c4b5fd", values: batteryWeek.map((d) => d.cr05) },
+      { key: "cr06", color: "#fdba74", values: batteryWeek.map((d) => d.cr06) },
     ],
     [],
   );
@@ -117,7 +121,7 @@ export function BiDashboard() {
     { label: "Uptime", value: k.uptime, delta: k.uptimeDelta, spark: sparks.uptime, color: "var(--go)", glow: false },
     { label: "Espera", value: k.wait, delta: k.waitDelta, spark: sparks.wait, color: "var(--go)", glow: true },
     { label: "Motos", value: k.motos, delta: k.motosDelta, spark: sparks.motos, color: "var(--info)", glow: false },
-    { label: "Combustible", value: k.fuel, delta: k.fuelDelta, spark: sparks.fuel, color: "var(--wait)", glow: false },
+    { label: "Gas no quemado", value: k.fuel, delta: k.fuelDelta, spark: sparks.fuel, color: "var(--wait)", glow: false },
     { label: "CO₂ evitado", value: k.co2, delta: k.co2Delta, spark: sparks.fuel, color: "var(--go)", glow: false },
     { label: "Alertas", value: k.alerts, delta: k.alertsDelta, spark: sparks.alerts, color: "var(--stop)", glow: true },
     { label: "Batería red", value: k.battery, delta: k.batteryDelta, spark: sparks.bat, color: "var(--wait)", glow: false },
@@ -256,6 +260,8 @@ export function BiDashboard() {
               <span className="text-[var(--info)]">CR-02</span>
               <span className="text-[var(--wait)]">CR-03</span>
               <span className="text-[var(--stop)]">CR-04</span>
+              <span style={{ color: "#c4b5fd" }}>CR-05</span>
+              <span style={{ color: "#fdba74" }}>CR-06</span>
             </div>
           </header>
           <MultiLine cats={batteryWeek.map((d) => d.d)} series={batSeries} />
@@ -338,8 +344,8 @@ export function BiDashboard() {
         <article className="bi-panel">
           <header className="bi-panel-h">
             <div>
-              <p className="kicker">Ahorro estimado</p>
-              <h2 className="text-sm font-medium text-white">Millones COP / mes</h2>
+              <p className="kicker">Gas no quemado</p>
+              <h2 className="text-sm font-medium text-white">Millones COP / mes · ralentí evitado</h2>
             </div>
           </header>
           <Columns rows={savingsMonth} />

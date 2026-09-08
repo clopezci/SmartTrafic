@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IntersectionTwin } from "@/components/intersection-twin";
 import { Bento, Kicker, Pill, Stat } from "@/components/ui";
 import { modeLabel } from "@/lib/algorithm";
-import { kpis } from "@/lib/demo-data";
+import { DEMO_MUNICIPALITY_NAME, FUEL_KPI_HINT, FUEL_KPI_LABEL, kpis } from "@/lib/demo-data";
 import { catalogAlerts, catalogIntersections } from "@/lib/catalog";
 import { relativeTime } from "@/lib/format";
 
@@ -14,10 +14,10 @@ export default async function EnVivoPage() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Kicker>Villa Esperanza</Kicker>
+          <Kicker>{DEMO_MUNICIPALITY_NAME}</Kicker>
           <h1 className="font-display text-4xl text-white md:text-5xl">En vivo</h1>
           <p className="mt-1 text-sm text-[var(--mute)]">
-            Gemelos de los cuatro cruces y lo que pide atención ahora.
+            Gemelos de los seis cruces y lo que pide atención ahora.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -35,7 +35,7 @@ export default async function EnVivoPage() {
           <Stat hint="versus ciclo fijo de 45s" label="Espera media" value={`−${kpis.waitDropPct}%`} />
         </Bento>
         <Bento>
-          <Stat hint="estimado del mes" label="Combustible" value={`${kpis.fuelSavedGal} gal`} />
+          <Stat hint={FUEL_KPI_HINT} label={FUEL_KPI_LABEL} value={`${kpis.fuelSavedGal} gal`} />
         </Bento>
         <Bento>
           <Stat hint="camiones de 3+ ejes" label="Carga pesada" value={String(kpis.trucks3axle)} />

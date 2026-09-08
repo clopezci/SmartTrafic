@@ -13,7 +13,7 @@ function seedApproaches(): ApproachLive[] {
   return [
     {
       id: "a",
-      name: "Calle A — entrada",
+      name: "Parque Central — norte",
       headingDeg: 0,
       color: "green",
       greenElapsedS: 0,
@@ -23,7 +23,7 @@ function seedApproaches(): ApproachLive[] {
     },
     {
       id: "b",
-      name: "Calle B — transversal",
+      name: "Circunvalar — este",
       headingDeg: 90,
       color: "red",
       greenElapsedS: 0,
@@ -33,7 +33,7 @@ function seedApproaches(): ApproachLive[] {
     },
     {
       id: "c",
-      name: "Calle A — salida",
+      name: "Parque Central — sur",
       headingDeg: 180,
       color: "green",
       greenElapsedS: 0,
@@ -43,7 +43,7 @@ function seedApproaches(): ApproachLive[] {
     },
     {
       id: "d",
-      name: "Calle B — opuesta",
+      name: "Circunvalar — oeste",
       headingDeg: 270,
       color: "red",
       greenElapsedS: 0,
@@ -86,7 +86,7 @@ export function Simulator() {
       id: "sim",
       municipalityId: "demo",
       code: "LAB-01",
-      name: "Laboratorio de escritorio",
+      name: "Parque Central · El Carmen de Viboral",
       geometry: "plus",
       lat: 0,
       lng: 0,
@@ -170,7 +170,7 @@ export function Simulator() {
               onClick={() => siren("a")}
               type="button"
             >
-              Sirena en Calle A
+              Sirena en Parque Central
             </button>
           </div>
         </Bento>

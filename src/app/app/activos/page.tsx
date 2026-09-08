@@ -24,7 +24,7 @@ export default async function ActivosPage() {
         <Kicker>Contrato mixto</Kicker>
         <h1 className="font-display text-4xl text-white">Activos</h1>
         <p className="mt-2 max-w-2xl text-sm text-[var(--mute)]">
-          El candado de renovación: el pueblo se queda con el acero. El cerebro se va si no pagan la suscripción.
+          El candado de renovación: el municipio se queda con el acero. El cerebro se va si no pagan la suscripción.
         </p>
       </div>
       <div className="grid gap-4 md:grid-cols-2">

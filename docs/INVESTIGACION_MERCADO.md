@@ -45,15 +45,15 @@ Espacio de competencia: un modelo mixto (el municipio paga postes/ópticas/solar
 ## 4. Brechas no cubiertas (las que vamos a ocupar)
 
 1. **Motos primero.** Colombia y buena parte de LatAm no son tráfico de carriles homogéneos. Motos ocupan 30–60 % del flujo, se filtran, se agrupan en la zona anticipada de detección (Manual de Señalización Vial 2024, Res. 45005). SCATS/NoTraffic optimizan autos. SmartTrafic clasifica moto / auto / bus / camión / bici / peatón y da peso distinto a la cola.
-2. **Solar de verdad, no “solar opcional”.** Los sistemas de marca mueren si se va la luz. El modo Eco (batería < 20 %) y el watchdog de carga son el diferencial de pueblo.
+2. **Solar de verdad, no “solar opcional”.** Los sistemas de marca mueren si se va la luz. El modo Eco (batería < 20 %) y el watchdog de carga son el diferencial de municipio.
 3. **Edge-first / nube-second.** Si se cae el 4G, el cruce sigue tomando decisiones locales. Los gigantes asumen backhaul permanente.
 4. **Tráfico heterogéneo.** Vendedores informales, buses que paran en el cruce, motocarros, desfiles, mercado dominical. El algoritmo tiene modos: colegio, mercado, procesión, noche antiatraco, emergencia, eco.
 5. **UX para no ingenieros.** El alcalde y el técnico de la secretaría no van a configurar SCATS. Bento, pocas decisiones, consumo progresivo.
 6. **OpEx en vez de CapEx tecnológico.** El municipio no financia el cerebro. Paga mensualidad. Eso encaja en contratación de servicios, no en licitación de obra de $2.000 millones.
-7. **WhatsApp / Telegram nativo.** El técnico del pueblo no abre un SIEM. Recibe “Cruce Parque se quedó en ámbar por conflicto de fases” al celular.
+7. **WhatsApp / Telegram nativo.** El técnico del municipio no abre un SIEM. Recibe “Cruce Parque se quedó en ámbar por conflicto de fases” al celular.
 8. **Inclusión peatonal real.** Luces de piso para peatón con celular, audio para invidentes, extensión de verde si hay peatón lento (adulto mayor, silla de ruedas).
 9. **Prioridad de emergencia sin hardware caro.** Sirena + visión + botón de la estación de bomberos en la app. No exige transpondedores Opticom de USD 3.000 por ambulancia.
-10. **Datos que el alcalde puede mostrar.** Combustible ahorrado, CO₂ evitado, camiones de 3+ ejes (argumento de peaje/variante), minutos ganados. Los semáforos tradicionales no generan narrativa política.
+10. **Datos que el alcalde puede mostrar.** Gas no quemado (ralentí evitado vs ciclo de 45 s), CO₂ evitado, camiones de 3+ ejes (argumento de peaje/variante), minutos ganados. Los semáforos tradicionales no generan narrativa política.
 11. **Ciberseguridad de gabinete.** NEMA TS 8 y ATC Cybersecurity exigen autenticación, cifrado, inventario de firmware. Casi ningún integrador local lo ofrece. SmartTrafic nace con TLS, firmas de dispositivo, RBAC, auditoría inmutable y conflicto-monitor lógico.
 12. **Cumplimiento colombiano.** Manual de Señalización 2024, motovías, zona anticipada, tiempos mínimos peatonales, no experimental “por moda”.
 13. **Gemelo digital antes de instalar.** Simular el cruce con conteos reales o sintéticos para mostrar al concejo “así se va a ver” sin romper una sola losa.
@@ -97,4 +97,4 @@ Espacio de competencia: un modelo mixto (el municipio paga postes/ópticas/solar
 
 ## 7. Tesis de producto
 
-NoTraffic es el espejo técnico. El municipio pequeño colombiano es el cliente. El producto no es “un semáforo con Wi-Fi”. Es **el sistema operativo de movilidad del pueblo**: adaptativo, solar, motos-first, vendible como suscripción, operable por un técnico con celular, y con un candado contractual limpio (el acero es del municipio; el cerebro es nuestro).
+NoTraffic es el espejo técnico. El municipio pequeño colombiano es el cliente. El producto no es “un semáforo con Wi-Fi”. Es **el sistema operativo de movilidad del municipio**: adaptativo, solar, motos-first, vendible como suscripción, operable por un técnico con celular, y con un candado contractual limpio (el acero es del municipio; el cerebro es nuestro).

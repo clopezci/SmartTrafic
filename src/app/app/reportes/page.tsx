@@ -1,5 +1,5 @@
 import { Bento, Kicker, Pill } from "@/components/ui";
-import { kpis } from "@/lib/demo-data";
+import { DEMO_MUNICIPALITY_NAME, kpis } from "@/lib/demo-data";
 
 export default function ReportesPage() {
   return (
@@ -13,27 +13,29 @@ export default function ReportesPage() {
       </div>
       <Bento glow="green">
         <div className="flex flex-wrap gap-2">
-          <Pill tone="green">Villa Esperanza</Pill>
+          <Pill tone="green">{DEMO_MUNICIPALITY_NAME}</Pill>
           <Pill>septiembre 2026</Pill>
           <Pill tone="blue">borrador automático</Pill>
         </div>
         <div className="prose-report mt-6 max-w-3xl space-y-4 text-[15px] leading-relaxed text-white/80">
           <p>
             Señor Alcalde: en las últimas cuatro semanas el sistema adaptativo de
-            cuatro cruces redujo la espera media un {kpis.waitDropPct}% frente a un
+            seis cruces redujo la espera media un {kpis.waitDropPct}% frente a un
             ciclo fijo de 45 segundos. Eso equivale, en la cuenta conservadora del
-            laboratorio, a {kpis.fuelSavedGal} galones de combustible que no se
-            quemaron en ralentí y {kpis.co2Tons} toneladas de CO₂ evitadas.
+            laboratorio, a {kpis.fuelSavedGal} galones de gasolina que no se
+            quemaron en ralentí (motores parados en el semáforo) y {kpis.co2Tons}{" "}
+            toneladas de CO₂ evitadas. No es el tanque solar del poste: es el
+            combustible que los vehículos dejaron de gastar por no esperar de más.
           </p>
           <p>
-            El cruce del Colegio San José operó en modo colegio en las ventanas de
-            6:50–7:40 y 12:20–13:30. El peatonal mínimo se respetó siempre. En la
-            Entrada Sur el algoritmo detectó {kpis.trucks3axle} pasos de camiones de
+            El cruce de Ospina operó en modo colegio en las ventanas de
+            6:50–7:40 y 12:20–13:30. El peatonal mínimo se respetó siempre. En
+            Circunvalar el algoritmo detectó {kpis.trucks3axle} pasos de camiones de
             tres o más ejes: es el número que Hacienda puede usar para hablar de
             desgaste de vía y de una eventual variante.
           </p>
           <p>
-            El Hospital está en modo Eco (batería al 18% tras tres días nublados).
+            Cementerio está en modo Eco (batería al 18% tras tres días nublados).
             El cruce no se apagó: degradó auxiliares y pasó a ámbar seguro cuando
             perdió el heartbeat. Recomendación: revisar el banco de baterías esta
             semana, no esperar a que el concejo se entere por Facebook.
@@ -41,7 +43,7 @@ export default function ReportesPage() {
           <p>
             Motos clasificadas en el mes: {kpis.motosClassified.toLocaleString("es-CO")}.
             El peso de cola no las trata como carros. Eso es la diferencia con SCATS
-            en un pueblo colombiano.
+            en un municipio colombiano.
           </p>
         </div>
       </Bento>

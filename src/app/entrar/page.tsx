@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BrandMark } from "@/components/signal";
 import { Bento, Button, Field, Kicker } from "@/components/ui";
+import { DEMO_MUNICIPALITY_EMAIL_DOMAIN } from "@/lib/demo-data";
 import { getLandingCopy, hasCustomPassword } from "@/lib/site-settings";
 
 export default function LoginPage({
@@ -66,9 +67,9 @@ async function LoginInner({
               Superadmin · clpezci@gmail.com ·{" "}
               {ownerCustom ? "la clave que definiste en Cuenta" : "Demo#SmartTrafic26"}
             </p>
-            <p>Alcaldía · alcalde@villaesperanza.gov.co · Demo#Municipio26</p>
-            <p>Técnico · tecnico@villaesperanza.gov.co · Demo#Tecnico26</p>
-            <p>Policía · transito@villaesperanza.gov.co · Demo#Visor26</p>
+            <p>Alcaldía · alcalde@{DEMO_MUNICIPALITY_EMAIL_DOMAIN} · Demo#Municipio26</p>
+            <p>Técnico · tecnico@{DEMO_MUNICIPALITY_EMAIL_DOMAIN} · Demo#Tecnico26</p>
+            <p>Policía · transito@{DEMO_MUNICIPALITY_EMAIL_DOMAIN} · Demo#Visor26</p>
           </div>
         ) : null}
       </Bento>

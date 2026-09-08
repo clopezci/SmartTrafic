@@ -30,7 +30,7 @@ const SCENES: {
     id: "queue",
     kicker: "01 · Peso de cola",
     title: "El verde se va con los carros",
-    blurb: "Calle Real llena a 200 m. El parque está casi vacío. El algoritmo corta el tiempo muerto.",
+    blurb: "Parque Central lleno a 200 m. Circunvalar está casi vacía. El algoritmo corta el tiempo muerto.",
     ms: 14000,
   },
   {
@@ -51,7 +51,7 @@ const SCENES: {
     id: "night",
     kicker: "04 · Noche antiatraco",
     title: "No te deja parado a las 11",
-    blurb: "La otra calle está vacía. Cambia a verde antes de que el carro frene en un pueblo solo.",
+    blurb: "La otra calle está vacía. Cambia a verde antes de que el carro frene en un municipio solo.",
     ms: 12000,
     night: true,
   },
@@ -59,7 +59,7 @@ const SCENES: {
     id: "school",
     kicker: "05 · Colegio",
     title: "El peatón no se negocia",
-    blurb: "Botón o detección: el verde peatonal mínimo se respeta aunque el pelotón esté empujando.",
+    blurb: "En Ospina el peatón no se negocia: el verde mínimo se respeta aunque el pelotón esté empujando.",
     ms: 13000,
   },
 ];

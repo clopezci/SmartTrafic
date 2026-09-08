@@ -26,9 +26,9 @@ Cuentas de demostración (también están en `/entrar`):
 | Rol | Correo | Clave |
 |---|---|---|
 | Dueño de plataforma | clpezci@gmail.com | Demo#SmartTrafic26 |
-| Alcaldía | alcalde@villaesperanza.gov.co | Demo#Municipio26 |
-| Técnico | tecnico@villaesperanza.gov.co | Demo#Tecnico26 |
-| Policía | transito@villaesperanza.gov.co | Demo#Visor26 |
+| Alcaldía | alcalde@carmendeviboral.gov.co | Demo#Municipio26 |
+| Técnico | tecnico@carmendeviboral.gov.co | Demo#Tecnico26 |
+| Policía | transito@carmendeviboral.gov.co | Demo#Visor26 |
 
 El módulo **Plataforma** (salud, auditoría, variables globales) solo aparece con el correo del dueño.
 
