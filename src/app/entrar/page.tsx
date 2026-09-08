@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { BrandMark } from "@/components/signal";
 import { Bento, Button, Field, Kicker } from "@/components/ui";
 import { getLandingCopy } from "@/lib/site-settings";
 
@@ -24,6 +26,9 @@ async function LoginInner({
         : q.error;
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5">
+      <Link className="mb-6 flex justify-center" href="/">
+        <BrandMark />
+      </Link>
       <Bento>
         <Kicker>Acceso</Kicker>
         <h1 className="mt-2 font-display text-3xl text-white">Entrar al tablero</h1>

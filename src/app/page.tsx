@@ -1,7 +1,11 @@
 import { ArrowRight } from "lucide-react";
 import { CinematicDemo } from "@/components/cinematic-demo";
+import { BrandMark, SignalMark } from "@/components/signal";
 import { Bento, Button, Kicker, Pill } from "@/components/ui";
 import { getLandingCopy, getLandingPlans } from "@/lib/site-settings";
+
+const PLAN_TONE = ["green", "amber", "red"] as const;
+const PLAN_LIT = ["go", "wait", "red"] as const;
 
 export default async function HomePage() {
   const plans = await getLandingPlans();
@@ -9,12 +13,7 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-6xl px-5 py-8 md:py-12">
       <header className="mb-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--go)] text-xs font-black text-[#04210f]">
-            ST
-          </span>
-          <span className="font-display text-xl text-white">SmartTrafic</span>
-        </div>
+        <BrandMark />
         <Button href="/entrar" variant="ghost">
           Entrar al tablero
         </Button>
@@ -48,9 +47,12 @@ export default async function HomePage() {
       </section>
 
       <section className="mt-16 grid gap-4 md:grid-cols-3">
-        {plans.map((plan) => (
-          <Bento key={plan.name}>
-            <Kicker>{plan.name}</Kicker>
+        {plans.map((plan, i) => (
+          <Bento glow={PLAN_TONE[i]} key={plan.name}>
+            <div className="flex items-start justify-between gap-3">
+              <Kicker>{plan.name}</Kicker>
+              <SignalMark lit={PLAN_LIT[i]} size={22} />
+            </div>
             <p className="mt-2 font-display text-3xl text-white">{plan.price}</p>
             <p className="mt-2 text-sm text-white/65">{plan.blurb}</p>
             <p className="mt-4 text-[11px] text-[var(--mute)]">{plan.footnote}</p>

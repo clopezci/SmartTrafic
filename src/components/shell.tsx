@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { isPlatformAdmin, roleLabel } from "@/lib/format";
+import { SignalMark } from "@/components/signal";
 import type { SessionUser } from "@/lib/types";
 
 const NAV = [
@@ -47,9 +48,7 @@ export function Shell({
     <div className="min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
       <aside className="border-b border-white/8 bg-[#080b11]/90 px-4 py-5 backdrop-blur lg:border-b-0 lg:border-r">
         <Link className="flex items-center gap-2 px-2" href="/app/tablero">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--go)] text-[11px] font-black text-[#04210f]">
-            ST
-          </span>
+          <SignalMark size={26} />
           <span>
             <span className="block font-display text-lg leading-none text-white">
               SmartTrafic

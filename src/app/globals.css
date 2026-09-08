@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #06080c;
-  --card: rgba(16, 20, 28, 0.72);
-  --stroke: rgba(255, 255, 255, 0.08);
-  --go: #3dff8a;
-  --wait: #ffb020;
-  --stop: #ff4d4d;
+  --bg: #07060a;
+  --card: rgba(14, 12, 16, 0.78);
+  --stroke: rgba(255, 255, 255, 0.09);
+  --go: #2ef28a;
+  --wait: #ffbf24;
+  --stop: #ff3b3b;
   --info: #7cb8ff;
-  --mute: #8b93a7;
+  --mute: #9aa0b4;
   --ink: #f4f6fb;
+  --housing: #101218;
 }
 
 @theme inline {
@@ -27,12 +28,30 @@ body {
   min-height: 100%;
 }
 
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 80;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--stop) 0%,
+    var(--wait) 48%,
+    var(--go) 100%
+  );
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--wait) 45%, transparent),
+    0 0 8px color-mix(in srgb, var(--go) 35%, transparent);
+}
+
 body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   background-image:
-    radial-gradient(1200px 600px at 12% -10%, rgba(61, 255, 138, 0.08), transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, rgba(255, 176, 32, 0.05), transparent 50%),
-    linear-gradient(180deg, #07090e 0%, #06080c 40%, #05070b 100%);
+    radial-gradient(900px 480px at 8% -8%, color-mix(in srgb, var(--stop) 16%, transparent), transparent 58%),
+    radial-gradient(820px 420px at 50% -12%, color-mix(in srgb, var(--wait) 12%, transparent), transparent 55%),
+    radial-gradient(900px 520px at 108% -6%, color-mix(in srgb, var(--go) 16%, transparent), transparent 58%),
+    linear-gradient(180deg, #0c0a10 0%, #07060a 42%, #050508 100%);
 }
 
 .font-display {
@@ -49,10 +68,33 @@ body {
 }
 
 .bento {
+  position: relative;
   border: 1px solid var(--stroke);
   background: var(--card);
   border-radius: 28px;
   backdrop-filter: blur(18px);
+}
+
+.bento::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  border-radius: 28px 28px 0 0;
+  background: linear-gradient(90deg, var(--stop), var(--wait), var(--go));
+  opacity: 0.7;
+}
+
+.bento-glow-go {
+  box-shadow: 0 0 44px -16px color-mix(in srgb, var(--go) 70%, transparent);
+}
+
+.bento-glow-wait {
+  box-shadow: 0 0 44px -16px color-mix(in srgb, var(--wait) 65%, transparent);
+}
+
+.bento-glow-stop {
+  box-shadow: 0 0 44px -16px color-mix(in srgb, var(--stop) 60%, transparent);
 }
 
 .nav-link {
@@ -111,6 +153,125 @@ body {
   );
 }
 
+.signal-mark {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-shrink: 0;
+  padding: 15% 0;
+  border-radius: 999px;
+  background: var(--housing);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 10px 22px rgba(0, 0, 0, 0.35);
+}
+
+.signal-lamp {
+  display: block;
+  width: 38%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #2a3038;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.12);
+}
+
+.signal-lamp.is-stop {
+  background: color-mix(in srgb, var(--stop) 22%, #2a3038);
+}
+
+.signal-lamp.is-wait {
+  background: color-mix(in srgb, var(--wait) 22%, #2a3038);
+}
+
+.signal-lamp.is-go {
+  background: color-mix(in srgb, var(--go) 22%, #2a3038);
+}
+
+.signal-mark[data-lit="red"] .is-stop,
+.signal-mark[data-lit="wait"] .is-wait,
+.signal-mark[data-lit="go"] .is-go {
+  filter: brightness(1.35);
+}
+
+.signal-mark[data-lit="red"] .is-stop {
+  background: var(--stop);
+  box-shadow: 0 0 10px var(--stop);
+}
+
+.signal-mark[data-lit="wait"] .is-wait {
+  background: var(--wait);
+  box-shadow: 0 0 10px var(--wait);
+}
+
+.signal-mark[data-lit="go"] .is-go {
+  background: var(--go);
+  box-shadow: 0 0 10px var(--go);
+}
+
+.signal-mark.is-cycle .signal-lamp {
+  animation: lamp-cycle 7.5s infinite;
+}
+
+.signal-mark.is-cycle .is-stop {
+  animation-name: lamp-stop;
+}
+
+.signal-mark.is-cycle .is-wait {
+  animation-name: lamp-wait;
+}
+
+.signal-mark.is-cycle .is-go {
+  animation-name: lamp-go;
+}
+
+@keyframes lamp-stop {
+  0%,
+  22% {
+    background: var(--stop);
+    box-shadow: 0 0 12px var(--stop);
+  }
+  28%,
+  100% {
+    background: color-mix(in srgb, var(--stop) 22%, #2a3038);
+    box-shadow: none;
+  }
+}
+
+@keyframes lamp-wait {
+  0%,
+  22%,
+  58%,
+  100% {
+    background: color-mix(in srgb, var(--wait) 22%, #2a3038);
+    box-shadow: none;
+  }
+  28%,
+  44% {
+    background: var(--wait);
+    box-shadow: 0 0 12px var(--wait);
+  }
+}
+
+@keyframes lamp-go {
+  0%,
+  48% {
+    background: color-mix(in srgb, var(--go) 22%, #2a3038);
+    box-shadow: none;
+  }
+  54%,
+  92% {
+    background: var(--go);
+    box-shadow: 0 0 12px var(--go);
+  }
+  96%,
+  100% {
+    background: color-mix(in srgb, var(--go) 22%, #2a3038);
+    box-shadow: none;
+  }
+}
+
 @keyframes pulse-dot {
   0%,
   100% {
@@ -125,4 +286,9 @@ body {
 
 input[type="range"] {
   height: 4px;
+}
+
+select option {
+  background: #12141c;
+  color: #f4f6fb;
 }

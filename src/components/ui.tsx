@@ -20,9 +20,9 @@ export function Bento({
       className={cn(
         "bento relative overflow-hidden p-5 md:p-6",
         span,
-        glow === "green" && "shadow-[0_0_40px_-18px_rgba(61,255,138,0.55)]",
-        glow === "amber" && "shadow-[0_0_40px_-18px_rgba(255,176,32,0.5)]",
-        glow === "red" && "shadow-[0_0_40px_-18px_rgba(255,77,77,0.45)]",
+        glow === "green" && "bento-glow-go",
+        glow === "amber" && "bento-glow-wait",
+        glow === "red" && "bento-glow-stop",
         className,
       )}
     >
@@ -64,9 +64,9 @@ export function Pill({
 }) {
   const map = {
     neutral: "bg-white/8 text-white/80",
-    green: "bg-[rgba(61,255,138,0.12)] text-[var(--go)]",
-    amber: "bg-[rgba(255,176,32,0.14)] text-[var(--wait)]",
-    red: "bg-[rgba(255,77,77,0.14)] text-[var(--stop)]",
+    green: "bg-[color-mix(in_srgb,var(--go)_16%,transparent)] text-[var(--go)]",
+    amber: "bg-[color-mix(in_srgb,var(--wait)_16%,transparent)] text-[var(--wait)]",
+    red: "bg-[color-mix(in_srgb,var(--stop)_16%,transparent)] text-[var(--stop)]",
     blue: "bg-[rgba(110,168,255,0.14)] text-[var(--info)]",
   };
   return (
@@ -96,7 +96,7 @@ export function Button({
 }) {
   const styles = {
     primary:
-      "bg-[var(--go)] text-[#04210f] hover:brightness-110 shadow-[0_0_24px_-8px_rgba(61,255,138,0.8)]",
+      "bg-[var(--go)] text-[#04210f] hover:brightness-110 shadow-[0_0_24px_-8px_color-mix(in_srgb,var(--go)_80%,transparent)]",
     ghost: "bg-white/6 text-white hover:bg-white/10 border border-white/10",
     danger: "bg-[var(--stop)] text-white hover:brightness-110",
   };
