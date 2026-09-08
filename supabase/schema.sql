@@ -247,8 +247,8 @@ create table if not exists public.health_heartbeats (
 -- ---------------------------------------------------------------------------
 create table if not exists public.system_settings (
   id uuid primary key default gen_random_uuid(),
-  municipality_id uuid unique references public.municipalities (id) on delete cascade,
-  -- null municipality_id = global platform settings (single row)
+  municipality_id uuid references public.municipalities (id) on delete cascade,
+  -- null municipality_id = global platform settings
   key text not null,
   value jsonb not null,
   updated_by uuid references public.profiles (id),
@@ -279,6 +279,59 @@ create table if not exists public.timing_profiles (
   sensor_bands_m integer[] not null default '{100,200,300}',
   weights jsonb not null default '{"m100":1,"m200":1.6,"m300":2.4,"wait":0.08,"moto":0.45,"bus":2.2,"truck":2.8,"ped":1.8}'::jsonb,
   created_at timestamptz not null default now()
+);
+
+-- ---------------------------------------------------------------------------
+-- Access grants (tester invites) — independent of auth.users
+-- ---------------------------------------------------------------------------
+create table if not exists public.access_grants (
+  email text primary key,
+  full_name text,
+  role public.user_role not null default 'viewer',
+  is_platform_admin boolean not null default false,
+  expires_at timestamptz,
+  password_issued text,
+  revoked boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+-- Demo / owner password hashes until the email exists in auth.users
+create table if not exists public.credential_overrides (
+  email text primary key,
+  password_hash text not null,
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.display_names (
+  email text primary key,
+  full_name text not null,
+  updated_at timestamptz not null default now()
+);
+
+-- Technicians of record (no auth user required)
+create table if not exists public.field_technicians (
+  id uuid primary key default gen_random_uuid(),
+  municipality_id uuid not null references public.municipalities (id) on delete cascade,
+  full_name text not null,
+  email text not null,
+  phone text,
+  status text not null default 'disponible',
+  assigned_codes text[] not null default '{}',
+  created_at timestamptz not null default now(),
+  unique (municipality_id, email)
+);
+
+create table if not exists public.kpi_daily (
+  day date not null,
+  municipality_id uuid not null references public.municipalities (id) on delete cascade,
+  wait_drop_pct numeric(5,2),
+  fuel_saved_gal numeric(8,2),
+  co2_tons numeric(8,3),
+  motos integer,
+  trucks_3axle integer,
+  uptime_pct numeric(5,2),
+  payload jsonb not null default '{}'::jsonb,
+  primary key (municipality_id, day)
 );
 
 -- ---------------------------------------------------------------------------
@@ -374,6 +427,11 @@ alter table public.health_events enable row level security;
 alter table public.health_heartbeats enable row level security;
 alter table public.system_settings enable row level security;
 alter table public.timing_profiles enable row level security;
+alter table public.access_grants enable row level security;
+alter table public.credential_overrides enable row level security;
+alter table public.display_names enable row level security;
+alter table public.field_technicians enable row level security;
+alter table public.kpi_daily enable row level security;
 
 -- Profiles
 drop policy if exists "profiles self or admin" on public.profiles;
@@ -530,6 +588,44 @@ create policy "timing read" on public.timing_profiles
 drop policy if exists "timing write" on public.timing_profiles;
 create policy "timing write" on public.timing_profiles
   for all using (public.is_superadmin() or municipality_id = public.current_municipality_id());
+
+alter table public.access_grants enable row level security;
+alter table public.credential_overrides enable row level security;
+alter table public.display_names enable row level security;
+alter table public.field_technicians enable row level security;
+alter table public.kpi_daily enable row level security;
+
+drop policy if exists "grants admin" on public.access_grants;
+create policy "grants admin" on public.access_grants
+  for all using (public.is_superadmin());
+
+drop policy if exists "creds admin" on public.credential_overrides;
+create policy "creds admin" on public.credential_overrides
+  for all using (public.is_superadmin());
+
+drop policy if exists "names admin" on public.display_names;
+create policy "names admin" on public.display_names
+  for all using (public.is_superadmin());
+
+drop policy if exists "names self" on public.display_names;
+create policy "names self" on public.display_names
+  for select using (lower(email) = lower(coalesce(auth.jwt()->>'email', '')));
+
+drop policy if exists "techs read" on public.field_technicians;
+create policy "techs read" on public.field_technicians
+  for select using (public.is_superadmin() or municipality_id = public.current_municipality_id());
+
+drop policy if exists "techs write" on public.field_technicians;
+create policy "techs write" on public.field_technicians
+  for all using (public.is_superadmin() or municipality_id = public.current_municipality_id());
+
+drop policy if exists "kpi read" on public.kpi_daily;
+create policy "kpi read" on public.kpi_daily
+  for select using (public.is_superadmin() or municipality_id = public.current_municipality_id());
+
+drop policy if exists "kpi write" on public.kpi_daily;
+create policy "kpi write" on public.kpi_daily
+  for all using (public.is_superadmin());
 
 -- Realtime (ignore if already added)
 do $$ begin

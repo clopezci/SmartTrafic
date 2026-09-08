@@ -32,10 +32,11 @@ Repo: https://github.com/clopezci/SmartTrafic
 ### 0.3 Correr el esquema SQL
 
 1. En Supabase: **SQL Editor → New query**
-2. Abre en este repo el archivo `supabase/schema.sql`
-3. Pega todo el contenido y pulsa **Run**
+2. Abre `supabase/schema.sql`, pega y **Run** (instalación nueva).
+3. Si **ya corriste** el schema antes, corre **además** `supabase/migrate_v2.sql` (invitaciones, claves, técnicos, KPIs y arreglo de `system_settings`).
 4. Abre `supabase/seed.sql`, pega y **Run**
-5. Si algo falla, copia el error y pégamelo.
+5. En la app: **Plataforma → Salud**. Todas las tablas deben salir en verde.
+6. Si algo falla, copia el error y pégamelo.
 
 ### 0.4 Crear tu usuario admin (el único que ve el módulo de plataforma)
 

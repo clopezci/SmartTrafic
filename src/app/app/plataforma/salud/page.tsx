@@ -1,8 +1,12 @@
 import { Bento, Button, Kicker, Pill, Stat } from "@/components/ui";
-import { healthIssues, heartbeats, kpis } from "@/lib/demo-data";
+import { healthIssues, kpis } from "@/lib/demo-data";
+import { probeTables } from "@/lib/persist";
 import { relativeTime } from "@/lib/format";
+import { heartbeats } from "@/lib/demo-data";
 
-export default function SaludPage() {
+export default async function SaludPage() {
+  const tables = await probeTables();
+  const dbOk = tables.some((t) => t.ok) && tables.every((t) => t.ok);
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -27,8 +31,12 @@ export default function SaludPage() {
         <Bento glow="amber">
           <Stat label="Issues abiertos" value={String(healthIssues.length)} />
         </Bento>
-        <Bento>
-          <Stat label="Ingesta" value="HMAC" hint="/api/ingest" />
+        <Bento glow={dbOk ? "green" : "amber"}>
+          <Stat
+            label="Postgres"
+            value={dbOk ? "listo" : "faltan tablas"}
+            hint="schema + migrate_v2"
+          />
         </Bento>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
@@ -68,6 +76,21 @@ export default function SaludPage() {
           </ul>
         </Bento>
       </div>
+      <Bento glow={dbOk ? "green" : "amber"}>
+        <Kicker>Tablas de persistencia</Kicker>
+        <p className="mt-2 text-xs text-[var(--mute)]">
+          Si alguna falta, en el SQL Editor de Supabase corre <code>supabase/migrate_v2.sql</code> y
+          luego otra vez <code>supabase/seed.sql</code>.
+        </p>
+        <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {tables.map((t) => (
+            <li className="flex items-center justify-between gap-2 text-sm" key={t.name}>
+              <span className="truncate font-mono text-xs text-white/80">{t.name}</span>
+              <Pill tone={t.ok ? "green" : "red"}>{t.ok ? "ok" : "falta"}</Pill>
+            </li>
+          ))}
+        </ul>
+      </Bento>
     </div>
   );
 }

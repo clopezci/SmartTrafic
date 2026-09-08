@@ -1,5 +1,5 @@
 import { Bento, Kicker, Pill } from "@/components/ui";
-import { devices, intersections } from "@/lib/demo-data";
+import { catalogDevices, catalogIntersections } from "@/lib/catalog";
 
 const MUNI = [
   "Postes y báculos de acero",
@@ -16,7 +16,8 @@ const OURS = [
   "Firmware, nube y dashboard",
 ];
 
-export default function ActivosPage() {
+export default async function ActivosPage() {
+  const [devices, intersections] = await Promise.all([catalogDevices(), catalogIntersections()]);
   return (
     <div className="space-y-5">
       <div>

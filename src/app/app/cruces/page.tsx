@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Bento, Kicker, Light, Pill } from "@/components/ui";
 import { modeLabel } from "@/lib/algorithm";
-import { intersections } from "@/lib/demo-data";
+import { catalogIntersections } from "@/lib/catalog";
 import { relativeTime } from "@/lib/format";
 
-export default function CrucesPage() {
+export default async function CrucesPage() {
+  const intersections = await catalogIntersections();
   return (
     <div>
       <Kicker>Red municipal</Kicker>

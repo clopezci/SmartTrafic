@@ -1,8 +1,9 @@
 import { Bento, Kicker } from "@/components/ui";
-import { auditEvents } from "@/lib/demo-data";
+import { catalogAudit } from "@/lib/catalog";
 import { relativeTime } from "@/lib/format";
 
-export default function AuditoriaPage() {
+export default async function AuditoriaPage() {
+  const auditEvents = await catalogAudit();
   return (
     <div>
       <Kicker>Append-only</Kicker>

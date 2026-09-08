@@ -9,6 +9,7 @@ import {
 } from "@/lib/access";
 import { municipalityVariables } from "@/lib/demo-data";
 import { isOwner, isPlatformAdmin, canWriteMunicipality } from "@/lib/format";
+import { dbAudit } from "@/lib/persist";
 import { getSession } from "@/lib/session";
 import {
   ALL_PLATFORM_FIELDS,
@@ -50,6 +51,12 @@ export async function savePlatformVariables(formData: FormData) {
     patch[key] = value;
   }
   await savePlatformValues(patch);
+  await dbAudit({
+    actorEmail: user?.email,
+    action: "settings.update",
+    entity: "system_settings",
+    diff: Object.keys(patch),
+  });
   const raw = String(formData.get("_next") || "/app/plataforma/variables");
   const next =
     raw === "/app/configuracion" || raw === "/app/plataforma/variables"
@@ -92,6 +99,12 @@ export async function createAccessGrant(formData: FormData) {
   const rest = (await listGrants()).filter((g) => g.email !== email);
   await writeGrants([grant, ...rest]);
   await clearRevokedEmail(email);
+  await dbAudit({
+    actorEmail: user?.email,
+    action: "access.grant",
+    entity: email,
+    diff: { role: spec.role, expiresAt },
+  });
   await setFlash(
     `Listo. ${email} entra con la clave ${password}${expiresAt ? ` · vence ${expiresAt.slice(0, 10)}` : " · sin vencimiento"}.`,
   );

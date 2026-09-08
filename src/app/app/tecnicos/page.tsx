@@ -1,7 +1,8 @@
 import { Bento, Kicker, Pill } from "@/components/ui";
-import { technicians } from "@/lib/demo-data";
+import { catalogTechnicians } from "@/lib/catalog";
 
-export default function TecnicosPage() {
+export default async function TecnicosPage() {
+  const technicians = await catalogTechnicians();
   return (
     <div>
       <Kicker>Gente</Kicker>

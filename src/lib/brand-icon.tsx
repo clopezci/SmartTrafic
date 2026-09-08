@@ -23,7 +23,7 @@ export function brandIcon(size: number, maskable = false) {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "space-evenly",
+            justifyContent: "space-between",
             width: housingW,
             height: housingH,
             background: "#101218",

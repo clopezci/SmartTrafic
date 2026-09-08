@@ -1,8 +1,9 @@
 import { Bento, Kicker, Pill, Stat } from "@/components/ui";
-import { municipalities } from "@/lib/demo-data";
+import { catalogMunicipalities } from "@/lib/catalog";
 import { cop } from "@/lib/format";
 
-export default function AlcaldiasPage() {
+export default async function AlcaldiasPage() {
+  const municipalities = await catalogMunicipalities();
   return (
     <div>
       <Kicker>Tenants</Kicker>

@@ -2,11 +2,14 @@ import Link from "next/link";
 import { IntersectionTwin } from "@/components/intersection-twin";
 import { Bento, Kicker, Pill, Stat } from "@/components/ui";
 import { modeLabel } from "@/lib/algorithm";
-import { alerts, intersections, kpis } from "@/lib/demo-data";
+import { kpis } from "@/lib/demo-data";
+import { catalogAlerts, catalogIntersections } from "@/lib/catalog";
 import { relativeTime } from "@/lib/format";
 
-export default function EnVivoPage() {
+export default async function EnVivoPage() {
+  const [intersections, dbAlerts] = await Promise.all([catalogIntersections(), catalogAlerts()]);
   const hero = intersections[0];
+  const alerts = dbAlerts;
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">

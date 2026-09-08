@@ -2,6 +2,19 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import type { AccessGrant } from "./access";
 import { platformVariables } from "./demo-data";
+import {
+  dbClearRevoke,
+  dbGetGrants,
+  dbGetHashes,
+  dbGetNames,
+  dbGetSettings,
+  dbPutGrants,
+  dbPutHash,
+  dbPutName,
+  dbPutSettings,
+  dbRevokeEmail,
+  dbRevokedEmails,
+} from "./persist";
 import type { SystemVariable } from "./types";
 
 const COOKIE = "st_vars";
@@ -95,10 +108,12 @@ export async function readSavedValues(): Promise<Record<string, string>> {
   const jar = await cookies();
   const raw = jar.get(COOKIE)?.value;
   const fromCookie = raw ? decode(raw) : null;
+  const fromDb = await dbGetSettings();
   return {
     ...defaultPlatformValues(),
     ...(memory ?? {}),
     ...(fromCookie ?? {}),
+    ...fromDb,
   };
 }
 
@@ -127,6 +142,7 @@ export async function savePlatformValues(patch: Record<string, string>): Promise
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
   });
+  await dbPutSettings(patch);
 }
 
 export async function getMergedPlatformVariables(): Promise<SystemVariable[]> {
@@ -172,6 +188,8 @@ export async function getLandingCopy() {
 }
 
 export async function listGrants(): Promise<AccessGrant[]> {
+  const fromDb = await dbGetGrants();
+  if (fromDb.length) return fromDb;
   const s = await readSavedValues();
   try {
     const parsed = JSON.parse(s[GRANTS_KEY] || "[]") as AccessGrant[];
@@ -183,16 +201,17 @@ export async function listGrants(): Promise<AccessGrant[]> {
 
 export async function writeGrants(grants: AccessGrant[]): Promise<void> {
   await savePlatformValues({ [GRANTS_KEY]: JSON.stringify(grants) });
+  await dbPutGrants(grants);
 }
 
 export async function revokedEmails(): Promise<Set<string>> {
   const s = await readSavedValues();
-  return new Set(
-    (s[REVOKED_KEY] || "")
-      .split(",")
-      .map((x) => x.trim().toLowerCase())
-      .filter(Boolean),
-  );
+  const fromCookie = (s[REVOKED_KEY] || "")
+    .split(",")
+    .map((x) => x.trim().toLowerCase())
+    .filter(Boolean);
+  const fromDb = await dbRevokedEmails();
+  return new Set([...fromCookie, ...fromDb]);
 }
 
 export async function addRevokedEmail(email: string): Promise<void> {
@@ -203,12 +222,14 @@ export async function addRevokedEmail(email: string): Promise<void> {
     [REVOKED_KEY]: [...set].join(","),
     [GRANTS_KEY]: JSON.stringify(grants),
   });
+  await dbRevokeEmail(email);
 }
 
 export async function clearRevokedEmail(email: string): Promise<void> {
   const set = await revokedEmails();
   set.delete(email.toLowerCase());
   await savePlatformValues({ [REVOKED_KEY]: [...set].join(",") });
+  await dbClearRevoke(email);
 }
 
 export async function setFlash(text: string): Promise<void> {
@@ -241,11 +262,11 @@ async function readJsonMap(key: string): Promise<Record<string, string>> {
 }
 
 export async function displayNames(): Promise<Record<string, string>> {
-  return readJsonMap(NAMES_KEY);
+  return { ...(await readJsonMap(NAMES_KEY)), ...(await dbGetNames()) };
 }
 
 export async function passwordHashes(): Promise<Record<string, string>> {
-  return readJsonMap(PASSHASH_KEY);
+  return { ...(await readJsonMap(PASSHASH_KEY)), ...(await dbGetHashes()) };
 }
 
 export function hashPassword(password: string): string {
@@ -263,12 +284,14 @@ export async function setDisplayName(email: string, fullName: string): Promise<v
   const names = await displayNames();
   names[email.toLowerCase()] = fullName.trim();
   await savePlatformValues({ [NAMES_KEY]: JSON.stringify(names) });
+  await dbPutName(email, fullName.trim());
 }
 
 export async function setPasswordHash(email: string, password: string): Promise<void> {
   const hashes = await passwordHashes();
   hashes[email.toLowerCase()] = hashPassword(password);
   await savePlatformValues({ [PASSHASH_KEY]: JSON.stringify(hashes) });
+  await dbPutHash(email, hashPassword(password));
 }
 
 export async function hasCustomPassword(email: string): Promise<boolean> {

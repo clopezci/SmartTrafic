@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { IntersectionTwin } from "@/components/intersection-twin";
 import { Bento, Kicker, Pill, Stat } from "@/components/ui";
 import { modeLabel } from "@/lib/algorithm";
-import { devices, intersections } from "@/lib/demo-data";
+import { catalogDevices, catalogIntersections } from "@/lib/catalog";
 import { relativeTime } from "@/lib/format";
 
 export default async function CrucePage({
@@ -11,6 +11,8 @@ export default async function CrucePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const intersections = await catalogIntersections();
+  const devices = await catalogDevices();
   const ix = intersections.find((i) => i.id === id);
   if (!ix) notFound();
   const owned = devices.filter((d) => d.intersectionId === ix.id);
