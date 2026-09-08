@@ -292,3 +292,56 @@ select option {
   background: #12141c;
   color: #f4f6fb;
 }
+
+.bi-tile {
+  border: 1px solid var(--stroke);
+  background: var(--card);
+  border-radius: 16px;
+  padding: 11px 12px;
+  backdrop-filter: blur(14px);
+}
+
+.bi-tile-hot {
+  box-shadow: 0 0 28px -14px color-mix(in srgb, var(--wait) 70%, transparent);
+}
+
+.bi-panel {
+  border: 1px solid var(--stroke);
+  background: var(--card);
+  border-radius: 20px;
+  padding: 14px 14px 12px;
+  backdrop-filter: blur(14px);
+}
+
+.bi-panel-h {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.bi-slicer {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.bi-slicer button {
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 11px;
+  color: var(--mute);
+}
+
+.bi-slicer button:hover {
+  color: white;
+}
+
+.bi-slicer button.is-on {
+  background: color-mix(in srgb, var(--go) 18%, transparent);
+  color: var(--go);
+}

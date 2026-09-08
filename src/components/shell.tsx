@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
 import {
   Activity,
+  BarChart3,
   Bell,
   Building2,
   Cpu,
   Gauge,
-  LayoutGrid,
   LogOut,
   Map,
+  Radio,
   Settings2,
   Shield,
   User,
@@ -20,7 +21,8 @@ import { SignalMark } from "@/components/signal";
 import type { SessionUser } from "@/lib/types";
 
 const NAV = [
-  { href: "/app/tablero", label: "Tablero", icon: LayoutGrid },
+  { href: "/app/tablero", label: "Tablero", icon: BarChart3 },
+  { href: "/app/en-vivo", label: "En vivo", icon: Radio },
   { href: "/app/cruces", label: "Cruces", icon: Map },
   { href: "/app/alertas", label: "Alertas", icon: Bell },
   { href: "/app/tecnicos", label: "Técnicos", icon: Wrench },
@@ -103,7 +105,7 @@ export function Shell({
       <div className="min-h-screen">
         <header className="flex items-center justify-between border-b border-white/8 px-5 py-4 md:px-8">
           <div>
-            <p className="kicker">Operación en vivo</p>
+            <p className="kicker">Centro de mando</p>
             <p className="text-sm text-white/80">
               {user.municipalityName ?? "Todas las alcaldías"} · {user.email}
             </p>

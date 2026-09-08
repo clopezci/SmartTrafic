@@ -76,7 +76,8 @@ Reglas que no se negocian:
 
 - `/` marketing
 - `/entrar` login
-- `/tablero` bento ultrapro
+- `/tablero` resumen BI (KPIs, gráficos, matriz)
+- `/en-vivo` gemelos operativos de cruces
 - `/cruces` y `/cruces/[id]` gemelo + sensores 100/200/300
 - `/alcaldias` tenants (superadmin ve todas)
 - `/tecnicos`
