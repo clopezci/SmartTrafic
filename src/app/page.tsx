@@ -1,8 +1,11 @@
 import { ArrowRight } from "lucide-react";
 import { CinematicDemo } from "@/components/cinematic-demo";
 import { Bento, Button, Kicker, Pill } from "@/components/ui";
+import { getLandingCopy, getLandingPlans } from "@/lib/site-settings";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const plans = await getLandingPlans();
+  const copy = await getLandingCopy();
   return (
     <div className="mx-auto max-w-6xl px-5 py-8 md:py-12">
       <header className="mb-16 flex items-center justify-between">
@@ -19,23 +22,19 @@ export default function HomePage() {
 
       <section className="grid items-end gap-10 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
-          <Pill tone="green">Fase 1 · plataforma municipal</Pill>
+          <Pill tone="green">{copy.pill}</Pill>
           <h1 className="mt-5 font-display text-5xl leading-[0.95] text-white md:text-7xl">
-            El pueblo no necesita
-            <span className="block text-[var(--go)]">romper las calles</span>
-            para semaforizarse.
+            {copy.hero1}
+            <span className="block text-[var(--go)]">{copy.hero2}</span>
+            {copy.hero3}
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-white/70">
-            Control adaptativo a 100, 200 y 300 metros. Solar. Motos primero.
-            El alcalde paga acero. El cerebro llega en comodato y se opera
-            desde el celular.
-          </p>
+          <p className="mt-6 max-w-xl text-lg text-white/70">{copy.lead}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button href="/entrar">
-              Ver el tablero <ArrowRight size={16} />
+              {copy.ctaPrimary} <ArrowRight size={16} />
             </Button>
             <Button href="/demo" variant="ghost">
-              Ver la simulación
+              {copy.ctaSecondary}
             </Button>
           </div>
         </div>
@@ -49,18 +48,12 @@ export default function HomePage() {
       </section>
 
       <section className="mt-16 grid gap-4 md:grid-cols-3">
-        {[
-          ["Esencial", "$1.0M / mes", "Mesh, noche segura, alertas, tablero."],
-          ["Adaptativo", "$1.5M / mes", "IA de colas, reportes al alcalde, bloqueos."],
-          ["Premium", "$2.1M / mes", "Piso LED, audio, ambulancia, hospital."],
-        ].map(([n, p, d]) => (
-          <Bento key={n}>
-            <Kicker>{n}</Kicker>
-            <p className="mt-2 font-display text-3xl text-white">{p}</p>
-            <p className="mt-2 text-sm text-white/65">{d}</p>
-            <p className="mt-4 text-[11px] text-[var(--mute)]">
-              Por cruce. Tecnología en comodato. Postes del municipio.
-            </p>
+        {plans.map((plan) => (
+          <Bento key={plan.name}>
+            <Kicker>{plan.name}</Kicker>
+            <p className="mt-2 font-display text-3xl text-white">{plan.price}</p>
+            <p className="mt-2 text-sm text-white/65">{plan.blurb}</p>
+            <p className="mt-4 text-[11px] text-[var(--mute)]">{plan.footnote}</p>
           </Bento>
         ))}
       </section>
@@ -69,17 +62,17 @@ export default function HomePage() {
         <Bento>
           <Kicker>Del municipio</Kicker>
           <ul className="mt-3 space-y-2 text-sm text-white/75">
-            <li>Postes, báculos y obra menor</li>
-            <li>Caras LED vehiculares y peatonales</li>
-            <li>Paneles, soportes y gabinete metálico</li>
+            {copy.muniBox.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </Bento>
         <Bento glow="amber">
           <Kicker>En comodato SmartTrafic</Kicker>
           <ul className="mt-3 space-y-2 text-sm text-white/75">
-            <li>Cerebro del cruce, ESP32, relés, módem</li>
-            <li>Cámaras / radar, firmware y plataforma</li>
-            <li>Si no se renueva, se retira el cerebro. El acero se queda.</li>
+            {copy.comodatoBox.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
           </ul>
         </Bento>
       </section>

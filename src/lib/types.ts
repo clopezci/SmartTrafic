@@ -48,6 +48,8 @@ export type SessionUser = {
   municipalityId: string | null;
   municipalityName: string | null;
   isPlatformAdmin: boolean;
+  grantExpiresAt?: string | null;
+  isGuest?: boolean;
 };
 
 export type Counts = {

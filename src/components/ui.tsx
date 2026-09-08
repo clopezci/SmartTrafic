@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/format";
 
 export function Bento({
@@ -105,6 +106,13 @@ export function Button({
     className,
   );
   if (href) {
+    if (href.startsWith("/")) {
+      return (
+        <Link className={cls} href={href}>
+          {children}
+        </Link>
+      );
+    }
     return (
       <a className={cls} href={href}>
         {children}
@@ -125,6 +133,9 @@ export function Field({
   type = "text",
   hint,
   readOnly,
+  options,
+  textarea,
+  required,
 }: {
   label: string;
   name?: string;
@@ -132,17 +143,47 @@ export function Field({
   type?: string;
   hint?: string;
   readOnly?: boolean;
+  options?: { value: string; label: string }[];
+  textarea?: boolean;
+  required?: boolean;
 }) {
+  const box =
+    "w-full rounded-xl border border-white/10 bg-white/4 px-3 py-2.5 text-sm text-white outline-none ring-[var(--go)] focus:ring-2";
   return (
     <label className="block">
       <span className="mb-1.5 block text-xs text-[var(--mute)]">{label}</span>
-      <input
-        className="w-full rounded-xl border border-white/10 bg-white/4 px-3 py-2.5 text-sm text-white outline-none ring-[var(--go)] focus:ring-2"
-        defaultValue={defaultValue}
-        name={name}
-        readOnly={readOnly}
-        type={type}
-      />
+      {options ? (
+        <select
+          className={box}
+          defaultValue={defaultValue}
+          disabled={readOnly}
+          name={name}
+          required={required}
+        >
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      ) : textarea ? (
+        <textarea
+          className={`${box} min-h-[88px]`}
+          defaultValue={defaultValue}
+          name={name}
+          readOnly={readOnly}
+          required={required}
+        />
+      ) : (
+        <input
+          className={box}
+          defaultValue={defaultValue}
+          name={name}
+          readOnly={readOnly}
+          required={required}
+          type={type}
+        />
+      )}
       {hint ? (
         <span className="mt-1 block text-[11px] text-[var(--mute)]">{hint}</span>
       ) : null}

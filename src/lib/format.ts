@@ -3,6 +3,11 @@ import type { Role, SessionUser } from "./types";
 
 export { SUPERADMIN_EMAIL } from "./types";
 
+export function isOwner(user: SessionUser | null | undefined): boolean {
+  if (!user) return false;
+  return user.email.toLowerCase() === SUPERADMIN_EMAIL;
+}
+
 export function isPlatformAdmin(user: SessionUser | null | undefined): boolean {
   if (!user) return false;
   return (

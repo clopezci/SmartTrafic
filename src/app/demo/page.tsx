@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { CinematicDemo } from "@/components/cinematic-demo";
 import { Button, Kicker } from "@/components/ui";
 
@@ -5,12 +6,12 @@ export default function DemoPage() {
   return (
     <div className="mx-auto max-w-5xl px-5 py-8 md:py-12">
       <header className="mb-8 flex items-center justify-between">
-        <a className="flex items-center gap-2" href="/">
+        <Link className="flex items-center gap-2" href="/">
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--go)] text-[11px] font-black text-[#04210f]">
             ST
           </span>
           <span className="font-display text-lg text-white">SmartTrafic</span>
-        </a>
+        </Link>
         <Button href="/entrar" variant="ghost">
           Entrar al tablero
         </Button>

@@ -14,7 +14,9 @@ import type {
   Technician,
 } from "./types";
 
-const MUNI_ID = "11111111-1111-1111-1111-111111111111";
+export const DEMO_MUNICIPALITY_ID = "11111111-1111-1111-1111-111111111111";
+const MUNI_ID = DEMO_MUNICIPALITY_ID;
+export const DEMO_MUNICIPALITY_NAME = "Villa Esperanza";
 
 export const DEMO_USERS: Record<
   string,

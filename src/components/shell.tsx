@@ -32,7 +32,7 @@ const NAV = [
 const PLATFORM = [
   { href: "/app/plataforma/salud", label: "Salud del sistema", icon: Shield },
   { href: "/app/plataforma/auditoria", label: "Auditoría", icon: Users },
-  { href: "/app/plataforma/variables", label: "Variables globales", icon: Settings2 },
+  { href: "/app/plataforma/variables", label: "Admin", icon: Settings2 },
 ];
 
 export function Shell({
@@ -70,7 +70,7 @@ export function Shell({
         {admin ? (
           <div className="mt-8 hidden lg:block">
             <p className="px-3 pb-2 text-[10px] uppercase tracking-[0.2em] text-[var(--go)]">
-              Solo dueño
+              Plataforma
             </p>
             {PLATFORM.map((item) => (
               <Link className="nav-link" href={item.href} key={item.href}>
@@ -83,7 +83,12 @@ export function Shell({
         <form action="/api/auth/logout" className="mt-8 px-2" method="post">
           <div className="rounded-2xl border border-white/8 bg-white/3 p-3">
             <p className="text-sm font-medium text-white">{user.fullName}</p>
-            <p className="text-[11px] text-[var(--mute)]">{roleLabel(user.role)}</p>
+            <p className="text-[11px] text-[var(--mute)]">
+              {roleLabel(user.role)}
+              {user.grantExpiresAt
+                ? ` · prueba hasta ${user.grantExpiresAt.slice(0, 10)}`
+                : ""}
+            </p>
             <button className="mt-3 flex items-center gap-2 text-xs text-white/60 hover:text-white" type="submit">
               <LogOut size={14} />
               Salir
