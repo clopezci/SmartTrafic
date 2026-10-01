@@ -14,9 +14,14 @@ export default async function HomePage() {
     <div className="mx-auto max-w-6xl px-4 py-6 md:px-5 md:py-12">
       <header className="mb-10 flex items-center justify-between gap-3 md:mb-16">
         <BrandMark />
-        <Button href="/entrar" variant="ghost">
-          Entrar al tablero
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button href="/piloto" variant="ghost">
+            Propuesta
+          </Button>
+          <Button href="/entrar" variant="ghost">
+            Entrar al tablero
+          </Button>
+        </div>
       </header>
 
       <section className="grid items-end gap-10 lg:grid-cols-[1.15fr_0.85fr]">
