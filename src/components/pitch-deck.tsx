@@ -40,8 +40,8 @@ const BONDS: { k: string; lines: string[] }[] = [
     k: "Seguridad de fases",
     lines: [
       "Nunca hay verde contra verde.",
-      "Ante la duda, el cruce pasa a ámbar intermitente.",
-      "El despeje ámbar y el all-red no se saltan.",
+      "Ante la duda, el cruce pasa a amarillo intermitente.",
+      "El despeje amarillo y el all-red no se saltan.",
     ],
   },
   {
@@ -207,16 +207,46 @@ export function PitchDeck({
           <h2 className="mt-3 max-w-3xl font-display text-4xl leading-[0.95] text-white md:text-6xl">
             El semáforo de siempre deja al alcalde sin una historia que contar.
           </h2>
-          <ul className="mt-10 grid max-w-5xl gap-4 md:grid-cols-2">
+          <ul className="mt-8 grid max-w-5xl gap-4 md:grid-cols-2">
             {[
-              ["La obra se paga una vez.", "El ciclo sigue fijo, igual el lunes que el domingo de mercado."],
-              ["Se va la luz.", "El cruce se apaga con ella."],
-              ["La moto pesa como un carro.", "En la fila colombiana la moto es la mitad del flujo, o más."],
-              ["El técnico se entera tarde.", "El reclamo ya está en redes y el concejo pide explicaciones."],
-            ].map(([title, body]) => (
-              <li className="bento p-5" key={title}>
-                <p className="font-display text-2xl text-white">{title}</p>
-                <p className="mt-3 text-sm leading-relaxed text-white/70">{body}</p>
+              {
+                k: "Pagar la obra una vez no basta.",
+                lines: [
+                  "El poste se queda.",
+                  "El ciclo sigue ciego, igual el lunes que el domingo de mercado.",
+                  "El alcalde no tiene un resultado para mostrar.",
+                ],
+              },
+              {
+                k: "Se va la luz y el cruce se apaga.",
+                lines: [
+                  "El semáforo depende del cable.",
+                  "En un municipio de sol, la esquina queda a ciegas.",
+                ],
+              },
+              {
+                k: "Contar la moto igual que un carro es un error.",
+                lines: [
+                  "No es una ventaja.",
+                  "La moto es la mitad de la fila, o más.",
+                  "El verde se lo lleva el lado equivocado.",
+                ],
+              },
+              {
+                k: "El técnico se entera cuando el daño ya es público.",
+                lines: [
+                  "El reclamo llega primero a redes.",
+                  "El concejo pregunta y no hay un dato del cruce.",
+                ],
+              },
+            ].map((item) => (
+              <li className="bento p-5" key={item.k}>
+                <p className="font-display text-2xl text-white">{item.k}</p>
+                <div className="mt-3 space-y-2 text-sm leading-relaxed text-white/70">
+                  {item.lines.map((line) => (
+                    <p key={line}>{line}</p>
+                  ))}
+                </div>
               </li>
             ))}
           </ul>
@@ -379,7 +409,12 @@ export function PitchDeck({
               "El piloto usa el cruce del municipio, con su tráfico.",
             ]}
           />
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 max-w-xl space-y-2 text-lg text-white">
+            <p>Carlos López</p>
+            <p>Jeison Franco</p>
+            <p className="text-white/75">{email}</p>
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
             <Button href={`mailto:${email}?subject=Piloto%20SmartTrafic`}>Escribir a {email}</Button>
             {wa ? (
               <Button href={wa} variant="ghost">

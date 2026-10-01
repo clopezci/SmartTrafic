@@ -27,7 +27,7 @@ self.addEventListener("fetch", (event) => {
 
   if (req.mode === "navigate") {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 12000);
+    const timer = setTimeout(() => ctrl.abort(), 20000);
     event.respondWith(
       fetch(req, { signal: ctrl.signal })
         .finally(() => clearTimeout(timer))
