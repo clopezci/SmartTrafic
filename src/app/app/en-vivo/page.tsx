@@ -1,20 +1,40 @@
 import Link from "next/link";
+import { LivePulse } from "@/components/live-pulse";
 import { IntersectionTwin } from "@/components/intersection-twin";
 import { Bento, Kicker, Pill, Stat } from "@/components/ui";
 import { modeLabel } from "@/lib/algorithm";
-import { DEMO_MUNICIPALITY_NAME, FUEL_KPI_HINT, FUEL_KPI_LABEL, kpis } from "@/lib/demo-data";
-import { catalogAlerts, catalogIntersections } from "@/lib/catalog";
+import { DEMO_MUNICIPALITY_NAME, FUEL_KPI_HINT, FUEL_KPI_LABEL } from "@/lib/demo-data";
+import { catalogAlerts, catalogIntersections, catalogMunicipalities } from "@/lib/catalog";
 import { relativeTime } from "@/lib/format";
+import { planAllows } from "@/lib/plans";
+import { loadReportKpis } from "@/lib/report";
+import { getSession } from "@/lib/session";
 
 export default async function EnVivoPage() {
-  const [intersections, dbAlerts] = await Promise.all([catalogIntersections(), catalogAlerts()]);
+  const user = await getSession();
+  const [intersections, dbAlerts, munis] = await Promise.all([
+    catalogIntersections(),
+    catalogAlerts(),
+    catalogMunicipalities(),
+  ]);
+  const mine = user?.municipalityId ? munis.find((m) => m.id === user.municipalityId) : munis[0];
+  const kpis = await loadReportKpis({
+    municipalityName: mine?.name || DEMO_MUNICIPALITY_NAME,
+    openAlerts: dbAlerts.filter((a) => !a.acknowledged).length,
+    intersectionsOnline: intersections.filter((i) => i.online).length,
+    intersectionsTotal: intersections.length,
+  });
   const hero = intersections[0];
+  if (!hero) {
+    return <p className="text-sm text-[var(--mute)]">No hay cruces todavía.</p>;
+  }
   const alerts = dbAlerts;
   return (
     <div className="space-y-5">
+      <LivePulse />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Kicker>{DEMO_MUNICIPALITY_NAME}</Kicker>
+          <Kicker>{kpis.municipalityName}</Kicker>
           <h1 className="font-display text-4xl text-white md:text-5xl">En vivo</h1>
           <p className="mt-1 text-sm text-[var(--mute)]">
             Gemelos de los seis cruces y lo que pide atención ahora.
@@ -56,7 +76,7 @@ export default async function EnVivoPage() {
               Abrir cruce
             </Link>
           </div>
-          <IntersectionTwin ix={hero} />
+          <IntersectionTwin ix={hero} showQueues={planAllows(hero.plan, "queues")} />
         </Bento>
         <div className="grid gap-4">
           {intersections.slice(1).map((ix) => (

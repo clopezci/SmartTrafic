@@ -10,3 +10,5 @@ node_modules
 cookies.txt
 *.tsbuildinfo
 next-env.d.ts
+__pycache__/
+*.pyc

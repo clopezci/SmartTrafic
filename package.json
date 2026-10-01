@@ -10,7 +10,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "node --experimental-strip-types --test src/lib/algorithm.test.ts src/lib/rate-limit.test.ts src/lib/hmac.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",

@@ -7,7 +7,7 @@ import { DEFAULT_TIMING, tickPhase } from "@/lib/algorithm";
 import { emptyCounts } from "@/lib/algorithm";
 import type { ApproachLive, Intersection, Mode } from "@/lib/types";
 
-const MODES: Mode[] = ["normal", "school", "night", "eco", "emergency"];
+const MODES: Mode[] = ["normal", "school", "market", "night", "eco", "emergency"];
 
 function seedApproaches(): ApproachLive[] {
   return [
@@ -66,12 +66,18 @@ export function Simulator() {
       setApproaches((prev) => {
         const next = tickPhase(prev, mode, DEFAULT_TIMING);
         const g = next.filter((a) => a.color === "green").map((a) => a.name);
+        const amber = next.filter((a) => a.color === "amber").map((a) => a.name);
         const f = next.some((a) => a.color === "flashing_amber");
+        const allRed = next[0]?.phase === "allred";
         setLog((l) =>
           [
             f
               ? "FAIL-SAFE: conflicto evitado → ámbar intermitente"
-              : `Verde: ${g.join(" + ") || "ninguno"}`,
+              : allRed
+                ? "Despeje: all-red"
+                : amber.length
+                  ? `Ámbar: ${amber.join(" + ")}`
+                  : `Verde: ${g.join(" + ") || "ninguno"}`,
             ...l,
           ].slice(0, 8),
         );

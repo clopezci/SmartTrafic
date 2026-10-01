@@ -1,18 +1,18 @@
-# MicroPython / Arduino-style satellite: receives {"color":"red|amber|green"} over ESP-NOW or local Wi-Fi.
-# Do not take decisions here. The brain does.
+# Satellite: applies a color. It does not decide phases.
+# Desk: reads /tmp/smarttrafic-sat.json {"color":"red|amber|green"}.
+# Board: replace the file read with ESP-NOW or MQTT smarttrafic/{code}/sat/{approach}.
 
 import json
 import time
 
 try:
-    import network
     from machine import Pin
 except ImportError:
-    network = None
     Pin = None
 
 
 RELAYS = {}
+CMD = "/tmp/smarttrafic-sat.json"
 
 
 def setup():
@@ -24,17 +24,26 @@ def setup():
 
 
 def apply(color: str) -> None:
+    wanted = "amber" if color in ("amber", "flashing_amber") else color
     for name, pin in RELAYS.items():
-        pin.value(1 if name == color else 0)
-    print("SATELLITE", color)
+        pin.value(1 if name == wanted else 0)
+    print("SATELLITE", wanted)
+
+
+def read_color() -> str:
+    try:
+        with open(CMD, encoding="utf-8") as handle:
+            body = json.load(handle)
+        return str(body.get("color") or "red")
+    except Exception:
+        return "red"
 
 
 def main():
     setup()
     while True:
-        # Replace with MQTT subscribe / ESP-NOW callback
-        apply("red")
-        time.sleep(1)
+        apply(read_color())
+        time.sleep(0.5)
 
 
 if __name__ == "__main__":

@@ -1,3 +1,6 @@
+import { emptyCounts } from "@/lib/algorithm";
+import { readOverlay } from "@/lib/ops";
+import { dbLatestSnapshots } from "@/lib/persist";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import {
   alerts as demoAlerts,
@@ -7,7 +10,7 @@ import {
   technicians as demoTechnicians,
   auditEvents as demoAudit,
 } from "@/lib/demo-data";
-import type { Alert, AuditEvent, Device, Intersection, Municipality, Technician } from "@/lib/types";
+import type { Alert, ApproachLive, AuditEvent, Device, Intersection, Municipality, Technician } from "@/lib/types";
 
 const IX_UUID: Record<string, string> = {
   "22222222-2222-2222-2222-222222222221": "ix-1",
@@ -27,34 +30,81 @@ function demoIxId(dbId: string | null | undefined, code?: string) {
   return dbId ? String(dbId) : null;
 }
 
+function liveFromPayload(payload: unknown, fallback: ApproachLive[]): ApproachLive[] {
+  if (!payload || typeof payload !== "object") return fallback;
+  const approaches = (payload as { approaches?: unknown }).approaches;
+  if (!Array.isArray(approaches) || approaches.length === 0) return fallback;
+  return approaches.map((raw, i) => {
+    const a = raw as Record<string, unknown>;
+    const base = fallback[i];
+    const counts = (a.counts ?? {}) as Record<string, unknown>;
+    return {
+      id: String(a.id || base?.id || i),
+      name: String(a.name || base?.name || "Acceso"),
+      headingDeg: Number(a.headingDeg ?? a.heading_deg ?? base?.headingDeg ?? 0),
+      color: (a.color as ApproachLive["color"]) || base?.color || "red",
+      greenElapsedS: Number(a.greenElapsedS ?? a.green_elapsed_s ?? 0),
+      pedWaiting: Boolean(a.pedWaiting ?? a.ped_waiting),
+      counts: {
+        ...emptyCounts(),
+        m100: Number(counts.m100 ?? 0),
+        m200: Number(counts.m200 ?? 0),
+        m300: Number(counts.m300 ?? 0),
+        waitS: Number(counts.waitS ?? counts.wait_s ?? 0),
+        motos: Number(counts.motos ?? 0),
+        cars: Number(counts.cars ?? 0),
+        buses: Number(counts.buses ?? 0),
+        trucks: Number(counts.trucks ?? 0),
+        peds: Number(counts.peds ?? 0),
+        emergency: Boolean(counts.emergency),
+      },
+      score: Number(a.score ?? 0),
+      phase: a.phase as ApproachLive["phase"],
+    };
+  });
+}
+
+function mergeById<T extends { id: string }>(base: T[], extra: T[]): T[] {
+  const seen = new Set(base.map((row) => row.id));
+  return [...base, ...extra.filter((row) => !seen.has(row.id))];
+}
+
 export async function catalogMunicipalities(): Promise<Municipality[]> {
+  const overlay = await readOverlay();
   const admin = createSupabaseAdmin();
-  if (!admin) return demoMunicipalities;
+  if (!admin) return mergeById(demoMunicipalities, overlay.municipalities);
   const { data, error } = await admin
     .from("municipalities")
     .select("id,name,department,population,plan,monthly_fee_cop,contract_start,contract_end,active")
     .eq("active", true);
-  if (error || !data?.length) return demoMunicipalities;
-  return data.map((m) => ({
-    id: String(m.id),
-    name: String(m.name),
-    department: String(m.department || ""),
-    population: Number(m.population || 0),
-    plan: m.plan,
-    monthlyFeeCop: Number(m.monthly_fee_cop || 0),
-    contractStart: String(m.contract_start || ""),
-    contractEnd: String(m.contract_end || ""),
-    active: Boolean(m.active),
-  }));
+  const base =
+    error || !data?.length
+      ? demoMunicipalities
+      : data.map((m) => ({
+          id: String(m.id),
+          name: String(m.name),
+          department: String(m.department || ""),
+          population: Number(m.population || 0),
+          plan: m.plan as Municipality["plan"],
+          monthlyFeeCop: Number(m.monthly_fee_cop || 0),
+          contractStart: String(m.contract_start || ""),
+          contractEnd: String(m.contract_end || ""),
+          active: Boolean(m.active),
+        }));
+  return mergeById(base, overlay.municipalities);
 }
 
 export async function catalogIntersections(): Promise<Intersection[]> {
+  const overlay = await readOverlay();
+  const snaps = await dbLatestSnapshots();
   const admin = createSupabaseAdmin();
-  if (!admin) return demoIntersections;
+  if (!admin) return mergeById(demoIntersections, overlay.intersections);
   const { data, error } = await admin.from("intersections").select("*");
-  if (error || !data?.length) return demoIntersections;
-  return data.map((row) => {
+  if (error || !data?.length) return mergeById(demoIntersections, overlay.intersections);
+  const rows = data.map((row) => {
     const demo = demoIntersections.find((i) => i.code === row.code);
+    const snap = snaps.get(String(row.id));
+    const fallback = demo?.live ?? [];
     return {
       ...(demo ?? demoIntersections[0]),
       id: demoIxId(String(row.id), String(row.code)) ?? String(row.id),
@@ -66,18 +116,21 @@ export async function catalogIntersections(): Promise<Intersection[]> {
       lng: Number(row.lng || 0),
       approaches: Number(row.approaches || 4),
       plan: row.plan,
-      mode: row.mode,
-      online: Boolean(row.online),
+      mode: (snap?.mode as Intersection["mode"]) || row.mode,
+      online: snap ? true : Boolean(row.online),
       healthScore: Number(row.health_score || 0),
       solar: Boolean(row.solar),
-      batteryPct: Number(row.battery_pct || 0),
+      batteryPct: snap?.battery ?? Number(row.battery_pct || 0),
       firmwareVersion: String(row.firmware_version || ""),
-      lastHeartbeatAt: row.last_heartbeat_at
-        ? String(row.last_heartbeat_at)
-        : new Date().toISOString(),
-      live: demo?.live ?? [],
+      lastHeartbeatAt: snap?.at
+        ? snap.at
+        : row.last_heartbeat_at
+          ? String(row.last_heartbeat_at)
+          : new Date().toISOString(),
+      live: snap ? liveFromPayload(snap.payload, fallback) : fallback,
     };
   });
+  return mergeById(rows, overlay.intersections);
 }
 
 export async function catalogAlerts(): Promise<Alert[]> {
@@ -117,18 +170,28 @@ export async function catalogDevices(): Promise<Device[]> {
 }
 
 export async function catalogTechnicians(): Promise<Technician[]> {
+  const overlay = await readOverlay();
   const admin = createSupabaseAdmin();
-  if (!admin) return demoTechnicians;
+  if (!admin) return mergeTechnicians(demoTechnicians, overlay.technicians);
   const { data, error } = await admin.from("field_technicians").select("*");
-  if (error || !data?.length) return demoTechnicians;
-  return data.map((t) => ({
+  if (error || !data?.length) return mergeTechnicians(demoTechnicians, overlay.technicians);
+  const rows = data.map((t) => ({
     id: String(t.id),
     fullName: String(t.full_name),
     email: String(t.email),
     phone: String(t.phone || ""),
     assigned: Array.isArray(t.assigned_codes) ? t.assigned_codes.map(String) : [],
     status: (t.status || "disponible") as Technician["status"],
+    municipalityId: String(t.municipality_id || ""),
+    checklist: Array.isArray(t.checklist) ? (t.checklist as Technician["checklist"]) : undefined,
   }));
+  return mergeTechnicians(rows, overlay.technicians);
+}
+
+function mergeTechnicians(base: Technician[], extra: Technician[]): Technician[] {
+  const byId = new Map(extra.map((t) => [t.id, t]));
+  const patched = base.map((t) => (byId.has(t.id) ? { ...t, ...byId.get(t.id) } : t));
+  return mergeById(patched, extra);
 }
 
 export async function catalogAudit(): Promise<AuditEvent[]> {

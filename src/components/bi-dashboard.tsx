@@ -44,7 +44,7 @@ const SCOPES: { id: BiScope; label: string }[] = [
   { id: "red", label: "Toda la red" },
 ];
 
-export function BiDashboard() {
+export function BiDashboard({ source = "demostración" }: { source?: "medido" | "demostración" }) {
   const [period, setPeriod] = useState<BiPeriod>("hoy");
   const [scope, setScope] = useState<BiScope>("villa");
   const k = useMemo(() => {
@@ -136,11 +136,14 @@ export function BiDashboard() {
           <p className="kicker">Inteligencia de red</p>
           <h1 className="font-display text-3xl text-white md:text-4xl">Tablero</h1>
           <p className="mt-1 max-w-xl text-xs text-[var(--mute)]">
-            Resumen ejecutivo · {scopeLabel[scope]} · datos de demostración hasta que el edge publique telemetría.
+            Resumen ejecutivo · {scopeLabel[scope]} ·{" "}
+            {source === "medido"
+              ? "los totales del reporte salen de kpi_daily. Las gráficas siguen el laboratorio."
+              : "datos de demostración hasta que el edge publique telemetría."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Pill tone="amber">demo</Pill>
+          <Pill tone={source === "medido" ? "green" : "amber"}>{source === "medido" ? "medido" : "demo"}</Pill>
           <Link className="text-xs text-[var(--go)] hover:underline" href="/app/en-vivo">
             Gemelos en vivo →
           </Link>

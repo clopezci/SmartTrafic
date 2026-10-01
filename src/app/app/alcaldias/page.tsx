@@ -1,9 +1,20 @@
-import { Bento, Kicker, Pill, Stat } from "@/components/ui";
+import { Bento, Button, Field, Kicker, Pill, Stat } from "@/components/ui";
 import { catalogMunicipalities } from "@/lib/catalog";
-import { cop } from "@/lib/format";
+import { cop, isPlatformAdmin } from "@/lib/format";
+import { getSession } from "@/lib/session";
+import { consumeFlash } from "@/lib/site-settings";
+import { createMunicipality } from "../red/actions";
 
-export default async function AlcaldiasPage() {
+export default async function AlcaldiasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ok?: string }>;
+}) {
+  const { ok } = await searchParams;
+  const flash = await consumeFlash();
+  const user = await getSession();
   const municipalities = await catalogMunicipalities();
+  const admin = isPlatformAdmin(user);
   return (
     <div>
       <Kicker>Tenants</Kicker>
@@ -11,6 +22,17 @@ export default async function AlcaldiasPage() {
       <p className="mt-2 text-sm text-[var(--mute)]">
         Cada municipio es un inquilino aislado. El superadmin ve todos. El secretario, solo el suyo.
       </p>
+      {flash ? (
+        <p
+          className={`mt-4 rounded-2xl px-4 py-3 text-sm ${
+            ok === "err"
+              ? "bg-[rgba(255,77,77,0.12)] text-[var(--stop)]"
+              : "border border-[var(--go)]/30 bg-[rgba(46,242,138,0.08)] text-[var(--go)]"
+          }`}
+        >
+          {flash}
+        </p>
+      ) : null}
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {municipalities.map((m) => (
           <Bento key={m.id} glow={m.plan === "premium" ? "green" : "none"}>
@@ -31,6 +53,29 @@ export default async function AlcaldiasPage() {
           </Bento>
         ))}
       </div>
+      {admin ? (
+        <Bento className="mt-6">
+          <Kicker>Nueva alcaldía</Kicker>
+          <form action={createMunicipality} className="mt-4 grid gap-4 md:grid-cols-2">
+            <Field label="Nombre" name="name" required />
+            <Field label="Departamento" name="department" required />
+            <Field label="Población" name="population" type="number" defaultValue="20000" />
+            <Field
+              label="Plan"
+              name="plan"
+              defaultValue="adaptativo"
+              options={[
+                { value: "esencial", label: "Esencial" },
+                { value: "adaptativo", label: "Adaptativo" },
+                { value: "premium", label: "Premium" },
+              ]}
+            />
+            <div className="md:col-span-2">
+              <Button type="submit">Crear alcaldía</Button>
+            </div>
+          </form>
+        </Bento>
+      ) : null}
     </div>
   );
 }

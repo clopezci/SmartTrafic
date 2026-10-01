@@ -17,6 +17,12 @@ export function isPlatformAdmin(user: SessionUser | null | undefined): boolean {
   );
 }
 
+export function canManageNetwork(user: SessionUser | null | undefined): boolean {
+  if (!user) return false;
+  if (isPlatformAdmin(user)) return true;
+  return user.role === "municipality_admin";
+}
+
 export function canWriteMunicipality(user: SessionUser | null | undefined): boolean {
   if (!user) return false;
   if (isPlatformAdmin(user)) return true;

@@ -74,6 +74,10 @@ export type ApproachLive = {
   pedWaiting: boolean;
   counts: Counts;
   score: number;
+  phase?: "service" | "yellow" | "allred";
+  phaseElapsedS?: number;
+  servingAxis?: "ns" | "ew";
+  pendingAxis?: "ns" | "ew";
 };
 
 export type Intersection = {
@@ -108,6 +112,8 @@ export type Municipality = {
   active: boolean;
 };
 
+export type CheckItem = { id: string; label: string; done: boolean };
+
 export type Technician = {
   id: string;
   fullName: string;
@@ -115,6 +121,8 @@ export type Technician = {
   phone: string;
   assigned: string[];
   status: "disponible" | "en_ruta" | "en_sitio";
+  municipalityId?: string;
+  checklist?: { code: string; items: CheckItem[] }[];
 };
 
 export type Alert = {
@@ -135,6 +143,16 @@ export type Device = {
   serial: string;
   owner: AssetOwner;
   label: string;
+};
+
+export type StoredCommandShape = {
+  id: string;
+  code: string;
+  kind: string;
+  payload: unknown;
+  signature: string;
+  status: string;
+  createdAt: string;
 };
 
 export type AuditEvent = {

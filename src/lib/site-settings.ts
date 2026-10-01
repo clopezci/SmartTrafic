@@ -64,7 +64,7 @@ export const EXTRA_PLATFORM_VARIABLES: SystemVariable[] = [
   { key: "demo.showAccounts", label: "Mostrar cuentas demo en /entrar", value: "true", scope: "platform", group: "Demostración", hint: "true / false. Ocúltalas cuando entre un alcalde real." },
   { key: "demo.maintenance", label: "Aviso de mantenimiento", value: "false", scope: "platform", group: "Demostración", hint: "true = banner en login. El dueño siempre entra." },
   { key: "demo.maintenanceMessage", label: "Texto de mantenimiento", value: "Estamos en mantenimiento corto. Vuelve en unos minutos.", scope: "platform", group: "Demostración", hint: "Solo si el aviso está en true." },
-  { key: "demo.lockLogins", label: "Cerrar logins (solo dueño)", value: "false", scope: "platform", group: "Demostración", hint: "true = nadie más entra. Útil si hay una demo privada." },
+  { key: "feature.platesLegal", label: "Módulo de placas habilitado", value: "false", scope: "platform", group: "Legal", hint: "true solo con base legal del municipio. Si está en false, la ingesta descarta placas." },
 ];
 
 export const ALL_PLATFORM_FIELDS: SystemVariable[] = [

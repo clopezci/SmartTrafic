@@ -44,6 +44,8 @@ export async function probeTables(): Promise<{ name: string; ok: boolean; detail
     "field_technicians",
     "kpi_daily",
     "health_events",
+    "field_commands",
+    "plate_events",
   ];
   const out: { name: string; ok: boolean; detail: string }[] = [];
   for (const name of names) {
@@ -251,11 +253,336 @@ export async function dbInsertSnapshot(input: {
   return null;
 }
 
-export async function dbFindIntersectionId(codeOrId: string): Promise<string | null> {
+export async function dbFindIntersection(codeOrId: string): Promise<{
+  id: string;
+  municipalityId: string;
+  code: string;
+  plan: string;
+} | null> {
   const admin = createSupabaseAdmin();
   if (!admin) return null;
-  const { data: byId } = await admin.from("intersections").select("id").eq("id", codeOrId).maybeSingle();
-  if (byId?.id) return String(byId.id);
-  const { data: byCode } = await admin.from("intersections").select("id").eq("code", codeOrId).maybeSingle();
-  return byCode?.id ? String(byCode.id) : null;
+  const cols = "id,municipality_id,code,plan";
+  const { data: byId } = await admin.from("intersections").select(cols).eq("id", codeOrId).maybeSingle();
+  const row =
+    byId ??
+    (await admin.from("intersections").select(cols).eq("code", codeOrId).maybeSingle()).data;
+  if (!row?.id) return null;
+  return {
+    id: String(row.id),
+    municipalityId: String(row.municipality_id),
+    code: String(row.code),
+    plan: String(row.plan || "adaptativo"),
+  };
+}
+
+export async function dbFindIntersectionId(codeOrId: string): Promise<string | null> {
+  const found = await dbFindIntersection(codeOrId);
+  return found?.id ?? null;
+}
+
+export async function dbLatestSnapshots(): Promise<
+  Map<string, { mode: string; battery: number | null; payload: unknown; at: string }>
+> {
+  const map = new Map<string, { mode: string; battery: number | null; payload: unknown; at: string }>();
+  const admin = createSupabaseAdmin();
+  if (!admin) return map;
+  const { data, error } = await admin
+    .from("intersection_snapshots")
+    .select("intersection_id,mode,battery_pct,payload,captured_at")
+    .order("captured_at", { ascending: false })
+    .limit(400);
+  if (error || !data) return map;
+  for (const row of data) {
+    const id = String(row.intersection_id);
+    if (map.has(id)) continue;
+    map.set(id, {
+      mode: String(row.mode || "normal"),
+      battery: row.battery_pct == null ? null : Number(row.battery_pct),
+      payload: row.payload,
+      at: String(row.captured_at),
+    });
+  }
+  return map;
+}
+
+export async function dbAddKpi(input: {
+  municipalityId: string;
+  motos: number;
+  trucks: number;
+  batteryPct?: number;
+}): Promise<void> {
+  const admin = createSupabaseAdmin();
+  if (!admin || !input.municipalityId) return;
+  const day = new Date().toISOString().slice(0, 10);
+  const { data } = await admin
+    .from("kpi_daily")
+    .select("motos,trucks_3axle,fuel_saved_gal,co2_tons,wait_drop_pct,uptime_pct,payload")
+    .eq("municipality_id", input.municipalityId)
+    .eq("day", day)
+    .maybeSingle();
+  const prevPayload = (data?.payload ?? {}) as { samples?: number; batteryPct?: number };
+  const samples = Number(prevPayload.samples || 0) + 1;
+  const motos = Number(data?.motos || 0) + input.motos;
+  const trucks = Number(data?.trucks_3axle || 0) + input.trucks;
+  const fuel = Number((motos * 0.0145).toFixed(2));
+  const row = {
+    day,
+    municipality_id: input.municipalityId,
+    motos,
+    trucks_3axle: trucks,
+    fuel_saved_gal: fuel,
+    co2_tons: Number((fuel * 0.0088).toFixed(3)),
+    wait_drop_pct: data?.wait_drop_pct ?? null,
+    uptime_pct: data?.uptime_pct ?? null,
+    payload: {
+      samples,
+      batteryPct: input.batteryPct ?? prevPayload.batteryPct ?? null,
+    },
+  };
+  if (data) {
+    await admin.from("kpi_daily").update(row).eq("municipality_id", input.municipalityId).eq("day", day);
+  } else {
+    await admin.from("kpi_daily").insert(row);
+  }
+}
+
+export async function dbKpiWindow(days = 30): Promise<
+  {
+    motos: number;
+    trucks: number;
+    fuel: number;
+    co2: number;
+    wait: number | null;
+    uptime: number | null;
+    rows: number;
+  } | null
+> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return null;
+  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const { data, error } = await admin
+    .from("kpi_daily")
+    .select("motos,trucks_3axle,fuel_saved_gal,co2_tons,wait_drop_pct,uptime_pct,day")
+    .gte("day", since);
+  if (error || !data?.length) return null;
+  const waitVals = data.map((r) => Number(r.wait_drop_pct)).filter((n) => Number.isFinite(n) && n > 0);
+  const upVals = data.map((r) => Number(r.uptime_pct)).filter((n) => Number.isFinite(n) && n > 0);
+  return {
+    motos: data.reduce((s, r) => s + Number(r.motos || 0), 0),
+    trucks: data.reduce((s, r) => s + Number(r.trucks_3axle || 0), 0),
+    fuel: data.reduce((s, r) => s + Number(r.fuel_saved_gal || 0), 0),
+    co2: data.reduce((s, r) => s + Number(r.co2_tons || 0), 0),
+    wait: waitVals.length ? waitVals.reduce((s, n) => s + n, 0) / waitVals.length : null,
+    uptime: upVals.length ? upVals.reduce((s, n) => s + n, 0) / upVals.length : null,
+    rows: data.length,
+  };
+}
+
+export async function dbCreateMunicipality(input: {
+  name: string;
+  department: string;
+  population: number;
+  plan: string;
+  monthlyFeeCop: number;
+}): Promise<{ id: string } | { error: string }> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return { error: "no-db" };
+  const { data, error } = await admin
+    .from("municipalities")
+    .insert({
+      name: input.name,
+      department: input.department,
+      population: input.population,
+      plan: input.plan,
+      monthly_fee_cop: input.monthlyFeeCop,
+      contract_start: new Date().toISOString().slice(0, 10),
+      contract_end: new Date(Date.now() + 86400000 * 365 * 2).toISOString().slice(0, 10),
+      active: true,
+    })
+    .select("id")
+    .single();
+  if (error || !data) return { error: error?.message || "insert" };
+  return { id: String(data.id) };
+}
+
+export async function dbCreateIntersection(input: {
+  municipalityId: string;
+  code: string;
+  name: string;
+  geometry: string;
+  plan: string;
+  lat: number;
+  lng: number;
+  approaches: { name: string; headingDeg: number }[];
+}): Promise<{ id: string } | { error: string }> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return { error: "no-db" };
+  const { data, error } = await admin
+    .from("intersections")
+    .insert({
+      municipality_id: input.municipalityId,
+      code: input.code,
+      name: input.name,
+      geometry: input.geometry,
+      plan: input.plan,
+      lat: input.lat,
+      lng: input.lng,
+      approaches: input.approaches.length,
+      mode: "normal",
+      online: false,
+      solar: true,
+      health_score: 100,
+    })
+    .select("id")
+    .single();
+  if (error || !data) return { error: error?.message || "insert" };
+  const id = String(data.id);
+  if (input.approaches.length) {
+    await admin.from("approaches").insert(
+      input.approaches.map((a) => ({
+        intersection_id: id,
+        name: a.name,
+        heading_deg: a.headingDeg,
+      })),
+    );
+  }
+  return { id };
+}
+
+export async function dbCreateTechnician(input: {
+  municipalityId: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  assigned: string[];
+  checklist: unknown;
+}): Promise<{ id: string } | { error: string }> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return { error: "no-db" };
+  const { data, error } = await admin
+    .from("field_technicians")
+    .insert({
+      municipality_id: input.municipalityId,
+      full_name: input.fullName,
+      email: input.email.toLowerCase(),
+      phone: input.phone,
+      status: "disponible",
+      assigned_codes: input.assigned,
+      checklist: input.checklist,
+    })
+    .select("id")
+    .single();
+  if (error || !data) return { error: error?.message || "insert" };
+  return { id: String(data.id) };
+}
+
+export async function dbSaveChecklist(
+  technicianId: string,
+  checklist: unknown,
+): Promise<string | null> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return "no-db";
+  const { error } = await admin.from("field_technicians").update({ checklist }).eq("id", technicianId);
+  if (error) return error.message;
+  return null;
+}
+
+export type StoredCommand = {
+  id: string;
+  code: string;
+  kind: string;
+  payload: unknown;
+  signature: string;
+  status: string;
+  createdAt: string;
+};
+
+export async function dbQueueCommand(input: {
+  code: string;
+  intersectionId: string | null;
+  kind: string;
+  payload: unknown;
+  signature: string;
+}): Promise<{ id: string } | { error: string }> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return { error: "no-db" };
+  const { data, error } = await admin
+    .from("field_commands")
+    .insert({
+      intersection_id: input.intersectionId,
+      intersection_code: input.code,
+      kind: input.kind,
+      payload: input.payload,
+      signature: input.signature,
+      status: "queued",
+    })
+    .select("id")
+    .single();
+  if (error || !data) return { error: error?.message || "insert" };
+  return { id: String(data.id) };
+}
+
+export async function dbPullCommands(code: string): Promise<StoredCommand[] | { error: string }> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return { error: "no-db" };
+  const { data, error } = await admin
+    .from("field_commands")
+    .select("id,intersection_code,kind,payload,signature,status,created_at")
+    .eq("intersection_code", code)
+    .eq("status", "queued")
+    .order("created_at", { ascending: true })
+    .limit(20);
+  if (error) return { error: error.message };
+  return (data ?? []).map((row) => ({
+    id: String(row.id),
+    code: String(row.intersection_code),
+    kind: String(row.kind),
+    payload: row.payload,
+    signature: String(row.signature),
+    status: String(row.status),
+    createdAt: String(row.created_at),
+  }));
+}
+
+export async function dbAckCommand(id: string): Promise<string | null> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return "no-db";
+  const { error } = await admin.from("field_commands").update({ status: "acked" }).eq("id", id);
+  return error ? error.message : null;
+}
+
+export async function dbInsertPlate(input: {
+  municipalityId: string;
+  intersectionId: string | null;
+  plate: string;
+  at?: string;
+}): Promise<string | null> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return "no-db";
+  const { error } = await admin.from("plate_events").insert({
+    municipality_id: input.municipalityId,
+    intersection_id: input.intersectionId,
+    plate: input.plate,
+    seen_at: input.at ?? new Date().toISOString(),
+  });
+  return error ? error.message : null;
+}
+
+export async function dbListPlates(limit = 40): Promise<
+  { id: string; plate: string; code: string; seenAt: string }[] | { error: string }
+> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return { error: "no-db" };
+  const { data, error } = await admin
+    .from("plate_events")
+    .select("id,plate,seen_at,intersection_id")
+    .order("seen_at", { ascending: false })
+    .limit(limit);
+  if (error) return { error: error.message };
+  return (data ?? []).map((row) => ({
+    id: String(row.id),
+    plate: String(row.plate),
+    code: row.intersection_id ? String(row.intersection_id) : "",
+    seenAt: String(row.seen_at),
+  }));
 }

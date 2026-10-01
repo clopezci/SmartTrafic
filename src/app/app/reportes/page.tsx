@@ -1,52 +1,83 @@
-import { Bento, Kicker, Pill } from "@/components/ui";
-import { DEMO_MUNICIPALITY_NAME, kpis } from "@/lib/demo-data";
+import { Bento, Button, Field, Kicker, Pill } from "@/components/ui";
+import { loadReportKpis, reportParagraphs } from "@/lib/report";
+import { catalogAlerts, catalogIntersections, catalogMunicipalities } from "@/lib/catalog";
+import { canManageNetwork } from "@/lib/format";
+import { planAllows } from "@/lib/plans";
+import { getSession } from "@/lib/session";
+import { consumeFlash } from "@/lib/site-settings";
+import { sendMayorReport } from "./actions";
 
-export default function ReportesPage() {
+export default async function ReportesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ok?: string }>;
+}) {
+  const { ok } = await searchParams;
+  const flash = await consumeFlash();
+  const user = await getSession();
+  const [munis, intersections, alerts] = await Promise.all([
+    catalogMunicipalities(),
+    catalogIntersections(),
+    catalogAlerts(),
+  ]);
+  const mine = user?.municipalityId ? munis.find((m) => m.id === user.municipalityId) : munis[0];
+  const plan = mine?.plan ?? "adaptativo";
+  const allowed = planAllows(plan, "reports") || user?.isPlatformAdmin;
+  const kpis = await loadReportKpis({
+    municipalityName: mine?.name || "el municipio",
+    openAlerts: alerts.filter((a) => !a.acknowledged).length,
+    intersectionsOnline: intersections.filter((i) => i.online).length,
+    intersectionsTotal: intersections.length,
+  });
+  const paragraphs = reportParagraphs(kpis);
+
   return (
     <div className="space-y-5">
       <div>
         <Kicker>Despacho del alcalde</Kicker>
         <h1 className="font-display text-4xl text-white">Reporte del mes</h1>
         <p className="mt-2 max-w-2xl text-sm text-[var(--mute)]">
-          En producción esto lo redacta un modelo de lenguaje con los datos reales y se va por correo. Aquí está el contenido, ya en lenguaje de gobierno.
+          El texto sale de los KPI del periodo. Con Resend se va al correo. Sin la clave, se queda en pantalla.
         </p>
       </div>
-      <Bento glow="green">
-        <div className="flex flex-wrap gap-2">
-          <Pill tone="green">{DEMO_MUNICIPALITY_NAME}</Pill>
-          <Pill>septiembre 2026</Pill>
-          <Pill tone="blue">borrador automático</Pill>
-        </div>
-        <div className="prose-report mt-6 max-w-3xl space-y-4 text-[15px] leading-relaxed text-white/80">
-          <p>
-            Señor Alcalde: en las últimas cuatro semanas el sistema adaptativo de
-            seis cruces redujo la espera media un {kpis.waitDropPct}% frente a un
-            ciclo fijo de 45 segundos. Eso equivale, en la cuenta conservadora del
-            laboratorio, a {kpis.fuelSavedGal} galones de gasolina que no se
-            quemaron en ralentí (motores parados en el semáforo) y {kpis.co2Tons}{" "}
-            toneladas de CO₂ evitadas. No es el tanque solar del poste: es el
-            combustible que los vehículos dejaron de gastar por no esperar de más.
+      {flash ? (
+        <p
+          className={`rounded-2xl px-4 py-3 text-sm ${
+            ok === "err"
+              ? "bg-[rgba(255,77,77,0.12)] text-[var(--stop)]"
+              : "border border-[var(--go)]/30 bg-[rgba(46,242,138,0.08)] text-[var(--go)]"
+          }`}
+        >
+          {flash}
+        </p>
+      ) : null}
+      {allowed ? (
+        <Bento glow="green">
+          <div className="flex flex-wrap gap-2">
+            <Pill tone="green">{kpis.municipalityName}</Pill>
+            <Pill>{kpis.monthLabel}</Pill>
+            <Pill tone={kpis.source === "medido" ? "green" : "amber"}>{kpis.source}</Pill>
+          </div>
+          <div className="mt-6 max-w-3xl space-y-4 text-[15px] leading-relaxed text-white/80">
+            {paragraphs.map((p) => (
+              <p key={p.slice(0, 24)}>{p}</p>
+            ))}
+          </div>
+          {canManageNetwork(user) ? (
+            <form action={sendMayorReport} className="mt-6 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+              <Field label="Correo del alcalde" name="to" type="email" required hint="Resend usa REPORTS_FROM_EMAIL." />
+              <Button type="submit">Enviar reporte</Button>
+            </form>
+          ) : null}
+        </Bento>
+      ) : (
+        <Bento glow="amber">
+          <Kicker>Plan {plan}</Kicker>
+          <p className="mt-2 text-sm text-white/70">
+            El reporte al alcalde entra con Adaptativo o Premium. Esencial deja tablero, alertas y noche segura.
           </p>
-          <p>
-            El cruce de Ospina operó en modo colegio en las ventanas de
-            6:50–7:40 y 12:20–13:30. El peatonal mínimo se respetó siempre. En
-            Circunvalar el algoritmo detectó {kpis.trucks3axle} pasos de camiones de
-            tres o más ejes: es el número que Hacienda puede usar para hablar de
-            desgaste de vía y de una eventual variante.
-          </p>
-          <p>
-            Cementerio está en modo Eco (batería al 18% tras tres días nublados).
-            El cruce no se apagó: degradó auxiliares y pasó a ámbar seguro cuando
-            perdió el heartbeat. Recomendación: revisar el banco de baterías esta
-            semana, no esperar a que el concejo se entere por Facebook.
-          </p>
-          <p>
-            Motos clasificadas en el mes: {kpis.motosClassified.toLocaleString("es-CO")}.
-            El peso de cola no las trata como carros. Eso es la diferencia con SCATS
-            en un municipio colombiano.
-          </p>
-        </div>
-      </Bento>
+        </Bento>
+      )}
       <div className="grid gap-4 md:grid-cols-3">
         <Bento>
           <Kicker>Uptime</Kicker>

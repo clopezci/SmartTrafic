@@ -1,8 +1,8 @@
-import { Bento, Button, Kicker, Pill } from "@/components/ui";
+import { Bento, Kicker, Pill } from "@/components/ui";
 import { catalogAlerts, catalogIntersections } from "@/lib/catalog";
 import { consumeFlash } from "@/lib/site-settings";
 import { relativeTime } from "@/lib/format";
-import { acknowledgeAlert } from "./actions";
+import { AckButton, OfflineQueue } from "@/components/offline-queue";
 
 export default async function AlertasPage({
   searchParams,
@@ -30,6 +30,7 @@ export default async function AlertasPage({
           {flash}
         </p>
       ) : null}
+      <OfflineQueue />
       <div className="mt-6 space-y-3">
         {alerts.map((a) => {
           const ix = intersections.find((i) => i.id === a.intersectionId);
@@ -57,14 +58,7 @@ export default async function AlertasPage({
                   </div>
                   <h2 className="mt-2 text-lg text-white">{a.title}</h2>
                   <p className="mt-1 text-sm text-white/65">{a.body}</p>
-                  {!a.acknowledged ? (
-                    <form action={acknowledgeAlert} className="mt-3">
-                      <input name="id" type="hidden" value={a.id} />
-                      <Button type="submit" variant="ghost">
-                        Acusar recibo
-                      </Button>
-                    </form>
-                  ) : null}
+                  {!a.acknowledged ? <AckButton id={a.id} /> : null}
                 </div>
                 <span className="text-xs text-[var(--mute)]">{relativeTime(a.createdAt)}</span>
               </div>

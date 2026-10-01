@@ -29,7 +29,13 @@ function Band({
   );
 }
 
-export function IntersectionTwin({ ix }: { ix: Intersection }) {
+export function IntersectionTwin({
+  ix,
+  showQueues = true,
+}: {
+  ix: Intersection;
+  showQueues?: boolean;
+}) {
   const max = useMemo(
     () =>
       Math.max(
@@ -85,8 +91,11 @@ export function IntersectionTwin({ ix }: { ix: Intersection }) {
               <span className="text-xs text-[var(--mute)]">score {a.score}</span>
             </div>
             <Band label="100 m" max={max} n={a.counts.m100} />
-            <Band label="200 m" max={max} n={a.counts.m200} />
-            <Band label="300 m" max={max} n={a.counts.m300} />
+            {showQueues ? <Band label="200 m" max={max} n={a.counts.m200} /> : null}
+            {showQueues ? <Band label="300 m" max={max} n={a.counts.m300} /> : null}
+            {showQueues ? null : (
+              <p className="mt-1 text-[11px] text-[var(--mute)]">Plan esencial: sin bandas de 200 y 300 m.</p>
+            )}
             <p className="mt-2 text-[11px] text-[var(--mute)]">
               {a.counts.motos} motos · {a.counts.cars} autos · {a.counts.buses} buses ·{" "}
               {a.counts.trucks} camiones · {a.counts.peds} peatones

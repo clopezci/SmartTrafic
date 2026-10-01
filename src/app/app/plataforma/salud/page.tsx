@@ -1,12 +1,32 @@
 import { Bento, Button, Kicker, Pill, Stat } from "@/components/ui";
-import { healthIssues, kpis } from "@/lib/demo-data";
+import { healthIssues } from "@/lib/demo-data";
 import { probeTables } from "@/lib/persist";
 import { relativeTime } from "@/lib/format";
 import { heartbeats } from "@/lib/demo-data";
+import { catalogAlerts, catalogIntersections } from "@/lib/catalog";
+import { loadReportKpis } from "@/lib/report";
 
 export default async function SaludPage() {
   const tables = await probeTables();
   const dbOk = tables.some((t) => t.ok) && tables.every((t) => t.ok);
+  const [intersections, alerts] = await Promise.all([catalogIntersections(), catalogAlerts()]);
+  const kpis = await loadReportKpis({
+    municipalityName: "la red",
+    openAlerts: alerts.filter((a) => !a.acknowledged).length,
+    intersectionsOnline: intersections.filter((i) => i.online).length,
+    intersectionsTotal: intersections.length,
+  });
+  const beats = heartbeats.map((h) => {
+    if (h.component === "MQTT") {
+      const ok = Boolean(process.env.MQTT_URL);
+      return { ...h, ok, latencyMs: ok ? h.latencyMs || 1 : 0, detail: ok ? "Broker configurado" : "Pendiente HiveMQ" };
+    }
+    if (h.component === "Telegram") {
+      const ok = Boolean(process.env.TELEGRAM_BOT_TOKEN);
+      return { ...h, ok, detail: ok ? "Bot listo" : "Falta token" };
+    }
+    return h;
+  });
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -43,7 +63,7 @@ export default async function SaludPage() {
         <Bento>
           <Kicker>Heartbeats</Kicker>
           <ul className="mt-4 space-y-3">
-            {heartbeats.map((h) => (
+            {beats.map((h) => (
               <li className="flex items-center justify-between text-sm" key={h.component}>
                 <div>
                   <p className="text-white">{h.component}</p>
@@ -79,8 +99,8 @@ export default async function SaludPage() {
       <Bento glow={dbOk ? "green" : "amber"}>
         <Kicker>Tablas de persistencia</Kicker>
         <p className="mt-2 text-xs text-[var(--mute)]">
-          Si alguna falta, en el SQL Editor de Supabase corre <code>supabase/migrate_v2.sql</code> y
-          luego otra vez <code>supabase/seed.sql</code>.
+          Si alguna falta, en el SQL Editor de Supabase corre <code>supabase/migrate_v3.sql</code>{" "}
+          (comandos, placas y checklist). Las tablas de la fase 1 siguen en schema y migrate_v2.
         </p>
         <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {tables.map((t) => (
