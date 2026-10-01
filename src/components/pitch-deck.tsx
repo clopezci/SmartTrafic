@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { BrandMark } from "@/components/signal";
 import { Button } from "@/components/ui";
 
@@ -72,9 +73,9 @@ export function PitchDeck({
   return (
     <div className="relative h-dvh">
       <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-center justify-between px-5 py-4 md:px-10">
-        <a className="pointer-events-auto" href="/">
+        <Link className="pointer-events-auto" href="/">
           <BrandMark />
-        </a>
+        </Link>
         <p className="font-mono text-xs tracking-[0.2em] text-white/55">
           {String(index + 1).padStart(2, "0")} / 05
         </p>

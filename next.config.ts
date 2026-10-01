@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // A package-lock in the user profile was making Next trace the wrong root and stall the build.
+  outputFileTracingRoot: path.join(process.cwd()),
   async headers() {
     return [
       {

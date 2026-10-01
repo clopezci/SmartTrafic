@@ -1,6 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 export function createSupabaseAdmin() {
+  // next build prerenders pages with a 60s cap. Live Supabase calls belong to the request, not the build.
+  if (process.env.NEXT_PHASE === "phase-production-build") return null;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
