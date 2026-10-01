@@ -247,7 +247,11 @@ export async function consumeFlash(): Promise<string | null> {
   const jar = await cookies();
   const raw = jar.get(FLASH)?.value;
   if (!raw) return null;
-  jar.delete(FLASH);
+  try {
+    jar.delete(FLASH);
+  } catch {
+    // En un render de Next solo se pueden leer cookies.
+  }
   return decode(raw)?.t ?? null;
 }
 

@@ -114,6 +114,35 @@ export type Municipality = {
 
 export type CheckItem = { id: string; label: string; done: boolean };
 
+export type BoardKind = "welcome" | "rule" | "info" | "alert";
+
+export type MessageBoard = {
+  id: string;
+  municipalityId: string;
+  code: string;
+  name: string;
+  place: string;
+  solar: boolean;
+  batteryPct: number | null;
+  online: boolean;
+  lastSeenAt: string | null;
+  currentText: string;
+  currentKind: BoardKind | null;
+};
+
+export type BoardMessage = {
+  id: string;
+  boardId: string;
+  municipalityId: string;
+  kind: BoardKind;
+  body: string;
+  authorEmail: string;
+  status: "live" | "ended";
+  startsAt: string;
+  endsAt: string | null;
+  createdAt: string;
+};
+
 export type Technician = {
   id: string;
   fullName: string;

@@ -46,6 +46,8 @@ export async function probeTables(): Promise<{ name: string; ok: boolean; detail
     "health_events",
     "field_commands",
     "plate_events",
+    "message_boards",
+    "board_messages",
   ];
   const out: { name: string; ok: boolean; detail: string }[] = [];
   for (const name of names) {
@@ -585,4 +587,73 @@ export async function dbListPlates(limit = 40): Promise<
     code: row.intersection_id ? String(row.intersection_id) : "",
     seenAt: String(row.seen_at),
   }));
+}
+
+export async function dbCreateBoard(input: {
+  municipalityId: string;
+  code: string;
+  name: string;
+  place: string;
+}): Promise<{ id: string } | { error: string }> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return { error: "no-db" };
+  const { data, error } = await admin
+    .from("message_boards")
+    .insert({
+      municipality_id: input.municipalityId,
+      code: input.code,
+      name: input.name,
+      place: input.place,
+      solar: true,
+      current_text: "",
+    })
+    .select("id")
+    .single();
+  if (error || !data) return { error: error?.message || "no se creó el letrero" };
+  return { id: String(data.id) };
+}
+
+export async function dbPublishBoardMessage(input: {
+  boardId: string;
+  municipalityId: string;
+  kind: string;
+  body: string;
+  authorEmail: string;
+  endsAt: string | null;
+}): Promise<string | null> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return "no-db";
+  const ended = await admin
+    .from("board_messages")
+    .update({ status: "ended" })
+    .eq("board_id", input.boardId)
+    .eq("status", "live");
+  if (ended.error && !missingTable(ended.error)) return ended.error.message;
+  const inserted = await admin.from("board_messages").insert({
+    board_id: input.boardId,
+    municipality_id: input.municipalityId,
+    kind: input.kind,
+    body: input.body,
+    author_email: input.authorEmail,
+    status: "live",
+    ends_at: input.endsAt,
+  });
+  if (inserted.error) return inserted.error.message;
+  const board = await admin
+    .from("message_boards")
+    .update({ current_text: input.body, current_kind: input.kind })
+    .eq("id", input.boardId);
+  return board.error ? board.error.message : null;
+}
+
+export async function dbTouchBoard(code: string, batteryPct: number | null): Promise<string | null> {
+  const admin = createSupabaseAdmin();
+  if (!admin) return "no-db";
+  const patch: { online: boolean; last_seen_at: string; battery_pct?: number } = {
+    online: true,
+    last_seen_at: new Date().toISOString(),
+  };
+  if (batteryPct != null) patch.battery_pct = batteryPct;
+  const { error } = await admin.from("message_boards").update(patch).eq("code", code);
+  return error ? error.message : null;
 }

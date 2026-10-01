@@ -3,11 +3,13 @@ import type {
   Alert,
   ApproachLive,
   AuditEvent,
+  BoardMessage,
   Counts,
   Device,
   HealthHeartbeat,
   HealthIssue,
   Intersection,
+  MessageBoard,
   Municipality,
   SessionUser,
   SystemVariable,
@@ -397,3 +399,34 @@ export const kpis = {
   intersectionsOnline: 5,
   intersectionsTotal: 6,
 };
+
+export const messageBoards: MessageBoard[] = [
+  {
+    id: "bd-1",
+    municipalityId: DEMO_MUNICIPALITY_ID,
+    code: "TB-01",
+    name: "Entrada norte",
+    place: "Vía a Rionegro",
+    solar: true,
+    batteryPct: 86,
+    online: true,
+    lastSeenAt: "2026-10-01T16:00:00.000Z",
+    currentText: "Bienvenidos. Velocidad máxima 30 en zona escolar.",
+    currentKind: "welcome",
+  },
+];
+
+export const boardMessages: BoardMessage[] = [
+  {
+    id: "bm-1",
+    boardId: "bd-1",
+    municipalityId: DEMO_MUNICIPALITY_ID,
+    kind: "welcome",
+    body: "Bienvenidos. Velocidad máxima 30 en zona escolar.",
+    authorEmail: "transito@carmendeviboral.gov.co",
+    status: "live",
+    startsAt: "2026-10-01T12:00:00.000Z",
+    endsAt: null,
+    createdAt: "2026-10-01T12:00:00.000Z",
+  },
+];

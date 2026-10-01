@@ -23,6 +23,12 @@ export function canManageNetwork(user: SessionUser | null | undefined): boolean 
   return user.role === "municipality_admin";
 }
 
+export function canPublishMessages(user: SessionUser | null | undefined): boolean {
+  if (!user) return false;
+  if (isPlatformAdmin(user)) return true;
+  return user.role === "municipality_admin" || user.role === "viewer" || user.role === "technician";
+}
+
 export function canWriteMunicipality(user: SessionUser | null | undefined): boolean {
   if (!user) return false;
   if (isPlatformAdmin(user)) return true;

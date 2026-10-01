@@ -33,7 +33,7 @@ Repo: https://github.com/clopezci/SmartTrafic
 
 1. En Supabase: **SQL Editor → New query**
 2. Abre `supabase/schema.sql`, pega y **Run** (instalación nueva).
-3. Si **ya corriste** el schema antes, corre **además** `supabase/migrate_v2.sql` y `supabase/migrate_v3.sql` (comandos al campo, placas y checklist de técnicos).
+3. Si **ya corriste** el schema antes, corre **además** `supabase/migrate_v2.sql`, `supabase/migrate_v3.sql` y `supabase/migrate_v4.sql` (comandos al campo, placas, checklist de técnicos y letreros).
 4. Abre `supabase/seed.sql`, pega y **Run**
 5. En la app: **Plataforma → Salud**. Todas las tablas deben salir en verde.
 6. Si algo falla, copia el error y pégamelo.

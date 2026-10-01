@@ -4,13 +4,26 @@ import { dbLatestSnapshots } from "@/lib/persist";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import {
   alerts as demoAlerts,
+  boardMessages as demoBoardMessages,
   devices as demoDevices,
   intersections as demoIntersections,
+  messageBoards as demoBoards,
   municipalities as demoMunicipalities,
   technicians as demoTechnicians,
   auditEvents as demoAudit,
 } from "@/lib/demo-data";
-import type { Alert, ApproachLive, AuditEvent, Device, Intersection, Municipality, Technician } from "@/lib/types";
+import type {
+  Alert,
+  ApproachLive,
+  AuditEvent,
+  BoardKind,
+  BoardMessage,
+  Device,
+  Intersection,
+  MessageBoard,
+  Municipality,
+  Technician,
+} from "@/lib/types";
 
 const IX_UUID: Record<string, string> = {
   "22222222-2222-2222-2222-222222222221": "ix-1",
@@ -192,6 +205,71 @@ function mergeTechnicians(base: Technician[], extra: Technician[]): Technician[]
   const byId = new Map(extra.map((t) => [t.id, t]));
   const patched = base.map((t) => (byId.has(t.id) ? { ...t, ...byId.get(t.id) } : t));
   return mergeById(patched, extra);
+}
+
+function mergeBoards(base: MessageBoard[], extra: MessageBoard[]): MessageBoard[] {
+  const byId = new Map(extra.map((board) => [board.id, board]));
+  const patched = base.map((board) => (byId.has(board.id) ? { ...board, ...byId.get(board.id) } : board));
+  return mergeById(patched, extra);
+}
+
+export async function catalogBoards(): Promise<MessageBoard[]> {
+  const overlay = await readOverlay();
+  const admin = createSupabaseAdmin();
+  if (!admin) return mergeBoards(demoBoards, overlay.boards);
+  const { data, error } = await admin.from("message_boards").select("*");
+  if (error || !data?.length) return mergeBoards(demoBoards, overlay.boards);
+  const rows: MessageBoard[] = data.map((row) => ({
+    id: String(row.id),
+    municipalityId: String(row.municipality_id),
+    code: String(row.code),
+    name: String(row.name),
+    place: String(row.place || ""),
+    solar: Boolean(row.solar),
+    batteryPct: row.battery_pct == null ? null : Number(row.battery_pct),
+    online: Boolean(row.online),
+    lastSeenAt: row.last_seen_at ? String(row.last_seen_at) : null,
+    currentText: String(row.current_text || ""),
+    currentKind: (row.current_kind || null) as BoardKind | null,
+  }));
+  return mergeBoards(rows, overlay.boards);
+}
+
+export async function catalogBoardMessages(): Promise<BoardMessage[]> {
+  const overlay = await readOverlay();
+  const admin = createSupabaseAdmin();
+  let base = demoBoardMessages;
+  if (admin) {
+    const { data, error } = await admin
+      .from("board_messages")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(40);
+    if (!error && data?.length) {
+      base = data.map((row) => ({
+        id: String(row.id),
+        boardId: String(row.board_id),
+        municipalityId: String(row.municipality_id),
+        kind: row.kind as BoardKind,
+        body: String(row.body),
+        authorEmail: String(row.author_email || ""),
+        status: row.status === "ended" ? "ended" : "live",
+        startsAt: String(row.starts_at),
+        endsAt: row.ends_at ? String(row.ends_at) : null,
+        createdAt: String(row.created_at),
+      }));
+    }
+  }
+  const byId = new Map(overlay.boardMessages.map((message) => [message.id, message]));
+  const patched = base.map((message) => (byId.has(message.id) ? { ...message, ...byId.get(message.id)! } : message));
+  const sorted = mergeById(overlay.boardMessages, patched).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  const liveBoard = new Set<string>();
+  return sorted.map((message) => {
+    if (message.status !== "live") return message;
+    if (liveBoard.has(message.boardId)) return { ...message, status: "ended" as const };
+    liveBoard.add(message.boardId);
+    return message;
+  });
 }
 
 export async function catalogAudit(): Promise<AuditEvent[]> {

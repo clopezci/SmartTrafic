@@ -7,9 +7,11 @@ const MUNI = [
   "Paneles solares y soportes",
   "Gabinete metálico IP66",
   "Obra civil menor / anclajes",
+  "Letrero de texto, poste y solar",
 ];
 const OURS = [
   "Cerebro edge (CM4 / ESP32-S3)",
+  "Controlador y módem del letrero",
   "Satélites ESP32 + relés",
   "Cámara IA / radar",
   "Módem 4G industrial",
