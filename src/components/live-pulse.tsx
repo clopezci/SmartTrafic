@@ -1,13 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
-export function LivePulse({ ms = 8000 }: { ms?: number }) {
+export function LivePulse({ ms = 20000 }: { ms?: number }) {
   const router = useRouter();
+  const [pending, startTransition] = useTransition();
+
   useEffect(() => {
-    const timer = setInterval(() => router.refresh(), ms);
-    return () => clearInterval(timer);
-  }, [router, ms]);
+    const wait = Math.max(ms, 20000);
+    const timer = window.setInterval(() => {
+      if (document.hidden || pending) return;
+      startTransition(() => {
+        router.refresh();
+      });
+    }, wait);
+    return () => window.clearInterval(timer);
+  }, [router, ms, pending]);
+
   return null;
 }

@@ -1,4 +1,4 @@
-const CACHE = "smarttrafic-v1";
+const CACHE = "smarttrafic-v2";
 const OFFLINE = "/offline.html";
 
 self.addEventListener("install", (event) => {
@@ -26,11 +26,15 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.startsWith("/api/")) return;
 
   if (req.mode === "navigate") {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12000);
     event.respondWith(
-      fetch(req).catch(async () => {
-        const cached = await caches.match(OFFLINE);
-        return cached || new Response("Sin conexión", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8" } });
-      }),
+      fetch(req, { signal: ctrl.signal })
+        .finally(() => clearTimeout(timer))
+        .catch(async () => {
+          const cached = await caches.match(OFFLINE);
+          return cached || new Response("Sin conexión", { status: 503, headers: { "Content-Type": "text/plain; charset=utf-8" } });
+        }),
     );
     return;
   }

@@ -63,24 +63,21 @@ export function Simulator() {
   useEffect(() => {
     if (!running) return;
     const t = setInterval(() => {
+      if (document.hidden) return;
       setApproaches((prev) => {
         const next = tickPhase(prev, mode, DEFAULT_TIMING);
         const g = next.filter((a) => a.color === "green").map((a) => a.name);
         const amber = next.filter((a) => a.color === "amber").map((a) => a.name);
         const f = next.some((a) => a.color === "flashing_amber");
         const allRed = next[0]?.phase === "allred";
-        setLog((l) =>
-          [
-            f
-              ? "FAIL-SAFE: conflicto evitado → ámbar intermitente"
-              : allRed
-                ? "Despeje: all-red"
-                : amber.length
-                  ? `Ámbar: ${amber.join(" + ")}`
-                  : `Verde: ${g.join(" + ") || "ninguno"}`,
-            ...l,
-          ].slice(0, 8),
-        );
+        const line = f
+          ? "FAIL-SAFE: conflicto evitado → ámbar intermitente"
+          : allRed
+            ? "Despeje: all-red"
+            : amber.length
+              ? `Ámbar: ${amber.join(" + ")}`
+              : `Verde: ${g.join(" + ") || "ninguno"}`;
+        queueMicrotask(() => setLog((l) => [line, ...l].slice(0, 8)));
         return next;
       });
     }, 900);

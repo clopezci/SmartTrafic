@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
 import type { BoardMessage, Intersection, MessageBoard, Municipality, StoredCommandShape, Technician } from "./types";
 import { readSavedValues, savePlatformValues } from "./site-settings";
 
@@ -48,7 +49,7 @@ async function readBoardCookie(): Promise<{ boards: MessageBoard[]; boardMessage
   }
 }
 
-export async function readOverlay(): Promise<Overlay> {
+export const readOverlay = cache(async function readOverlay(): Promise<Overlay> {
   const saved = await readSavedValues();
   const raw = saved[KEY];
   let base = empty();
@@ -74,7 +75,7 @@ export async function readOverlay(): Promise<Overlay> {
     boards: mergeRows(base.boards, boards.boards),
     boardMessages: mergeRows(base.boardMessages, boards.boardMessages),
   };
-}
+});
 
 export async function writeOverlay(next: Overlay): Promise<void> {
   const jar = await cookies();

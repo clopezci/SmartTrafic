@@ -1,5 +1,6 @@
 import type { AccessGrant } from "./access";
 import { DEMO_MUNICIPALITY_ID, municipalityVariables } from "./demo-data";
+import { cache } from "react";
 import { createSupabaseAdmin } from "./supabase/admin";
 import type { Role } from "./types";
 
@@ -49,24 +50,23 @@ export async function probeTables(): Promise<{ name: string; ok: boolean; detail
     "message_boards",
     "board_messages",
   ];
-  const out: { name: string; ok: boolean; detail: string }[] = [];
-  for (const name of names) {
-    const started = Date.now();
-    const { error, count } = await admin.from(name).select("*", { count: "exact", head: true });
-    if (error) {
-      out.push({
-        name,
-        ok: false,
-        detail: missingTable(error) ? "tabla ausente — corre supabase/migrate_v2.sql" : error.message,
-      });
-    } else {
-      out.push({ name, ok: true, detail: `${count ?? 0} filas · ${Date.now() - started} ms` });
-    }
-  }
-  return out;
+  return Promise.all(
+    names.map(async (name) => {
+      const started = Date.now();
+      const { error, count } = await admin.from(name).select("*", { count: "exact", head: true });
+      if (error) {
+        return {
+          name,
+          ok: false,
+          detail: missingTable(error) ? "tabla ausente — corre supabase/migrate_v2.sql" : error.message,
+        };
+      }
+      return { name, ok: true, detail: `${count ?? 0} filas · ${Date.now() - started} ms` };
+    }),
+  );
 }
 
-export async function dbGetSettings(): Promise<Record<string, string>> {
+export const dbGetSettings = cache(async function dbGetSettings(): Promise<Record<string, string>> {
   const admin = createSupabaseAdmin();
   if (!admin) return {};
   const { data, error } = await admin.from("system_settings").select("key,value,municipality_id");
@@ -76,7 +76,7 @@ export async function dbGetSettings(): Promise<Record<string, string>> {
     out[String(row.key)] = fromJsonb(row.value);
   }
   return out;
-}
+});
 
 export async function dbPutSettings(patch: Record<string, string>): Promise<string | null> {
   const admin = createSupabaseAdmin();
@@ -282,7 +282,7 @@ export async function dbFindIntersectionId(codeOrId: string): Promise<string | n
   return found?.id ?? null;
 }
 
-export async function dbLatestSnapshots(): Promise<
+export const dbLatestSnapshots = cache(async function dbLatestSnapshots(): Promise<
   Map<string, { mode: string; battery: number | null; payload: unknown; at: string }>
 > {
   const map = new Map<string, { mode: string; battery: number | null; payload: unknown; at: string }>();
@@ -292,7 +292,7 @@ export async function dbLatestSnapshots(): Promise<
     .from("intersection_snapshots")
     .select("intersection_id,mode,battery_pct,payload,captured_at")
     .order("captured_at", { ascending: false })
-    .limit(400);
+    .limit(48);
   if (error || !data) return map;
   for (const row of data) {
     const id = String(row.intersection_id);
@@ -305,7 +305,7 @@ export async function dbLatestSnapshots(): Promise<
     });
   }
   return map;
-}
+});
 
 export async function dbAddKpi(input: {
   municipalityId: string;

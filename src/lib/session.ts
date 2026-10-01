@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { grantStillValid, grantToUser, verifyInvitePassword } from "./access";
 import { DEMO_USERS } from "./demo-data";
 import {
@@ -119,7 +120,7 @@ export async function clearSession(): Promise<void> {
   jar.delete(COOKIE);
 }
 
-export async function getSession(): Promise<SessionUser | null> {
+export const getSession = cache(async function getSession(): Promise<SessionUser | null> {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
   if (!token) return null;
@@ -133,7 +134,7 @@ export async function getSession(): Promise<SessionUser | null> {
     if (blocked.has(named.email.toLowerCase())) return null;
   }
   return named;
-}
+});
 
 export function supabaseConfigured(): boolean {
   return Boolean(

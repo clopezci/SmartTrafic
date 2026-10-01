@@ -6,7 +6,25 @@ export function createSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
-  return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  return createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: async (input, init) => {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 4000);
+        try {
+          return await fetch(input, { ...init, signal: ctrl.signal });
+        } catch {
+          return new Response(JSON.stringify({ message: "supabase no respondió a tiempo" }), {
+            status: 503,
+            headers: { "content-type": "application/json" },
+          });
+        } finally {
+          clearTimeout(timer);
+        }
+      },
+    },
+  });
 }
 
 async function findAuthUser(admin: SupabaseClient, email: string) {

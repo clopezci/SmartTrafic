@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import type { AccessGrant } from "./access";
 import { platformVariables } from "./demo-data";
 import {
@@ -104,7 +105,7 @@ export function defaultPlatformValues(): Record<string, string> {
   return Object.fromEntries(ALL_PLATFORM_FIELDS.map((v) => [v.key, v.value]));
 }
 
-export async function readSavedValues(): Promise<Record<string, string>> {
+export const readSavedValues = cache(async function readSavedValues(): Promise<Record<string, string>> {
   const jar = await cookies();
   const raw = jar.get(COOKIE)?.value;
   const fromCookie = raw ? decode(raw) : null;
@@ -115,7 +116,7 @@ export async function readSavedValues(): Promise<Record<string, string>> {
     ...(fromCookie ?? {}),
     ...fromDb,
   };
-}
+});
 
 function slim(values: Record<string, string>): Record<string, string> {
   const defaults = defaultPlatformValues();

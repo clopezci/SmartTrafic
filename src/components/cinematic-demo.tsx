@@ -296,17 +296,27 @@ export function CinematicDemo({ compact = false }: { compact?: boolean }) {
     startedRef.current = performance.now();
     vehiclesRef.current = sceneVehicles(SCENES[sceneRef.current].id);
 
+    let lastW = 0;
+    let lastH = 0;
+    let fitFrame = 0;
     const fit = () => {
       const parent = canvas.parentElement;
-      const w = Math.max(parent?.clientWidth ?? 0, canvas.clientWidth, 320);
-      const h = Math.max(parent?.clientHeight ?? 0, Math.round(w * (compact ? 0.72 : 0.78)));
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (!parent) return;
+      const w = Math.max(Math.floor(parent.clientWidth), 320);
+      const h = Math.round(w * (compact ? 0.72 : 0.78));
+      if (w === lastW && h === lastH) return;
+      lastW = w;
+      lastH = h;
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     fit();
-    const ro = new ResizeObserver(fit);
+    const ro = new ResizeObserver(() => {
+      cancelAnimationFrame(fitFrame);
+      fitFrame = requestAnimationFrame(fit);
+    });
     if (canvas.parentElement) ro.observe(canvas.parentElement);
 
     const draw = (now: number) => {
@@ -538,13 +548,21 @@ export function CinematicDemo({ compact = false }: { compact?: boolean }) {
         ctx.fillRect(0, 0, w, h);
       }
 
+      if (document.hidden) return;
       raf = requestAnimationFrame(draw);
     };
 
-    raf = requestAnimationFrame(draw);
+    const onHide = () => {
+      if (document.hidden) cancelAnimationFrame(raf);
+      else raf = requestAnimationFrame(draw);
+    };
+    document.addEventListener("visibilitychange", onHide);
+    if (!document.hidden) raf = requestAnimationFrame(draw);
     return () => {
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(fitFrame);
       ro.disconnect();
+      document.removeEventListener("visibilitychange", onHide);
     };
   }, [compact]);
 
